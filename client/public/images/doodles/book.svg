@@ -1,0 +1,16 @@
+<svg viewBox="0 0 100 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M50 20 L50 72" stroke="#4B4039" stroke-width="3" stroke-linecap="round" opacity="0.4" />
+  <path d="M50 70 Q30 66 8 72 L8 24 Q30 18 50 22 Z" fill="#9C82D8" />
+  <path d="M50 70 Q70 66 92 72 L92 24 Q70 18 50 22 Z" fill="#F47767" />
+  <path d="M50 67 Q30 63 11 68 L11 21 Q30 16 50 20 Z" fill="#FFF7EC" stroke="#F5E9D8" stroke-width="1" />
+  <path d="M50 64 Q30 60 14 65 L14 18 Q30 13 50 17 Z" fill="#FFFFFF" />
+  <line x1="20" y1="26" x2="43" y2="24" stroke="#BDF3EE" stroke-width="2" stroke-linecap="round" />
+  <line x1="20" y1="33" x2="43" y2="31" stroke="#BDF3EE" stroke-width="2" stroke-linecap="round" />
+  <line x1="20" y1="40" x2="38" y2="38" stroke="#BDF3EE" stroke-width="2" stroke-linecap="round" />
+  <path d="M50 67 Q70 63 89 68 L89 21 Q70 16 50 20 Z" fill="#FFF7EC" stroke="#F5E9D8" stroke-width="1" />
+  <path d="M50 64 Q70 60 86 65 L86 18 Q70 13 50 17 Z" fill="#FFFFFF" />
+  <circle cx="70" cy="27" r="4" fill="#FFB58F" />
+  <path d="M60 48 L68 38 L76 48 Z" fill="#83C98B" />
+  <path d="M72 48 L78 41 L84 48 Z" fill="#21B8AF" />
+  <path d="M50 20 Q54 40 58 55 L54 53 L50 56 Z" fill="#FFB58F" />
+</svg>

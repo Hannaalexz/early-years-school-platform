@@ -1,0 +1,18 @@
+<svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="bubbleGrad" cx="38%" cy="32%" r="65%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.85" />
+      <stop offset="45%" stop-color="#42D3C9" stop-opacity="0.45" />
+      <stop offset="85%" stop-color="#21B8AF" stop-opacity="0.8" />
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0.7" />
+    </radialGradient>
+    <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.95" />
+      <stop offset="100%" stop-color="#42D3C9" stop-opacity="0.4" />
+    </linearGradient>
+  </defs>
+  <circle cx="50" cy="50" r="46" fill="url(#bubbleGrad)" stroke="url(#ringGrad)" stroke-width="2.5" />
+  <ellipse cx="36" cy="32" rx="14" ry="8" transform="rotate(-30 36 32)" fill="#FFFFFF" fill-opacity="0.75" />
+  <circle cx="68" cy="66" r="4.5" fill="#FFFFFF" fill-opacity="0.55" />
+  <circle cx="28" cy="46" r="3" fill="#FFFFFF" fill-opacity="0.45" />
+</svg>

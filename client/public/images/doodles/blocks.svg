@@ -1,0 +1,17 @@
+<svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <g transform="translate(10, 42)">
+    <rect x="0" y="0" width="38" height="38" rx="8" fill="#42D3C9" stroke="#FFFFFF" stroke-width="2.5" />
+    <rect x="4" y="4" width="30" height="30" rx="5" fill="#21B8AF" />
+    <text x="19" y="27" text-anchor="middle" fill="#FFFFFF" font-family="Baloo 2" font-weight="800" font-size="22">B</text>
+  </g>
+  <g transform="translate(52, 45)">
+    <rect x="0" y="0" width="38" height="38" rx="8" fill="#FFB58F" stroke="#FFFFFF" stroke-width="2.5" />
+    <rect x="4" y="4" width="30" height="30" rx="5" fill="#FFA575" />
+    <text x="19" y="27" text-anchor="middle" fill="#FFFFFF" font-family="Baloo 2" font-weight="800" font-size="22">C</text>
+  </g>
+  <g transform="translate(31, 8)">
+    <rect x="0" y="0" width="38" height="38" rx="8" fill="#F47767" stroke="#FFFFFF" stroke-width="2.5" />
+    <rect x="4" y="4" width="30" height="30" rx="5" fill="#E85E50" />
+    <text x="19" y="27" text-anchor="middle" fill="#FFFFFF" font-family="Baloo 2" font-weight="800" font-size="22">A</text>
+  </g>
+</svg>

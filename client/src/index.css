@@ -1,0 +1,570 @@
+@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&family=Nunito:wght@400;500;600;700;800;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* =========================================================
+   BUBBLES EARLY YEARS SCHOOL
+   Interactive • Bright • Playful • Professional
+========================================================= */
+
+/* =========================================================
+   1. COLOR SYSTEM & DESIGN TOKENS
+========================================================= */
+
+:root {
+  /* Main Brand */
+  --turquoise: #42D3C9;
+  --turquoise-dark: #21B8AF;
+  --turquoise-deep: #168F89;
+  --turquoise-light: #BDF3EE;
+
+  /* Supporting Colors */
+  --coral: #F47767;
+  --coral-dark: #E85E50;
+
+  --peach: #FFB58F;
+  --peach-light: #FFE1D2;
+
+  --purple: #9C82D8;
+  --purple-light: #E6DDF7;
+
+  --green: #83C98B;
+  --green-light: #DDF1DE;
+
+  /* Neutral */
+  --cream: #FFF7EC;
+  --cream-dark: #F5E9D8;
+
+  --brown: #4B4039;
+  --brown-light: #746860;
+
+  --white: #FFFFFF;
+
+  /* Effects */
+  --shadow: 0 18px 45px rgba(36, 119, 115, 0.12);
+  --soft-shadow: 0 8px 25px rgba(36, 119, 115, 0.10);
+  --radius: 24px;
+}
+
+/* =========================================================
+   2. GLOBAL TYPOGRAPHY & RESET
+========================================================= */
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Nunito', sans-serif;
+  color: var(--brown);
+  background: var(--cream);
+  overflow-x: hidden;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+.font-display {
+  font-family: 'Baloo 2', sans-serif;
+  font-weight: 700;
+  line-height: 1.05;
+}
+
+/* =========================================================
+   3. ANIMATIONS FOR REAL VISIBLE MOTION
+========================================================= */
+
+@keyframes bubbleFloat {
+  0%, 100% {
+    transform: translateY(0) translateX(0);
+  }
+  50% {
+    transform: translateY(-25px) translateX(12px);
+  }
+}
+
+@keyframes imageFloat {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-12px) rotate(1deg);
+  }
+}
+
+@keyframes pencilFloat {
+  0%, 100% {
+    transform: translateY(0) rotate(-8deg);
+  }
+  50% {
+    transform: translateY(-20px) rotate(8deg);
+  }
+}
+
+@keyframes starSpin {
+  0% {
+    transform: rotate(0deg) scale(1);
+  }
+  50% {
+    transform: rotate(20deg) scale(1.15);
+  }
+  100% {
+    transform: rotate(0deg) scale(1);
+  }
+}
+
+@keyframes cloudMove {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(25px);
+  }
+}
+
+@keyframes heartBeat {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+}
+
+@keyframes butterflyFlutter {
+  0%, 100% {
+    transform: translateY(0) translateX(0) rotate(-4deg);
+  }
+  33% {
+    transform: translateY(-18px) translateX(10px) rotate(6deg);
+  }
+  66% {
+    transform: translateY(-8px) translateX(-6px) rotate(-8deg);
+  }
+}
+
+@keyframes planeGlide {
+  0%, 100% {
+    transform: translateY(0) translateX(0) rotate(3deg);
+  }
+  50% {
+    transform: translateY(-16px) translateX(14px) rotate(-4deg);
+  }
+}
+
+@keyframes sunPulse {
+  0%, 100% {
+    transform: rotate(0deg) scale(1);
+  }
+  50% {
+    transform: rotate(15deg) scale(1.08);
+  }
+}
+
+@keyframes bookFloat {
+  0%, 100% {
+    transform: translateY(0) rotate(4deg);
+  }
+  50% {
+    transform: translateY(-18px) rotate(-3deg);
+  }
+}
+
+@keyframes blocksWobble {
+  0%, 100% {
+    transform: translateY(0) rotate(-2deg);
+  }
+  50% {
+    transform: translateY(-14px) rotate(4deg);
+  }
+}
+
+@keyframes rainbowFloat {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-10px) scale(1.05);
+  }
+}
+
+@keyframes flowerSway {
+  0%, 100% {
+    transform: rotate(-6deg);
+  }
+  50% {
+    transform: rotate(8deg);
+  }
+}
+
+@keyframes scribblePulse {
+  0%, 100% {
+    transform: scale(1) rotate(0deg);
+  }
+  50% {
+    transform: scale(1.1) rotate(6deg);
+  }
+}
+
+@keyframes pillarBookFloat {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-5px) rotate(-3deg);
+  }
+}
+
+@keyframes pillarPuzzleWiggle {
+  0%, 100% {
+    transform: rotate(0deg) scale(1);
+  }
+  25% {
+    transform: rotate(-4deg) scale(1.05);
+  }
+  75% {
+    transform: rotate(4deg) scale(1.05);
+  }
+}
+
+@keyframes pillarTeacherBreathe {
+  0%, 100% {
+    transform: scale(1) translateY(0);
+  }
+  50% {
+    transform: scale(1.06) translateY(-4px);
+  }
+}
+
+@keyframes pillarHeartBeat {
+  0%, 100% {
+    transform: scale(1);
+  }
+  14% {
+    transform: scale(1.15);
+  }
+  28% {
+    transform: scale(1);
+  }
+  42% {
+    transform: scale(1.1);
+  }
+  70% {
+    transform: scale(1);
+  }
+}
+
+.animate-pillar-book {
+  animation: pillarBookFloat 3.2s ease-in-out infinite;
+}
+
+.animate-pillar-puzzle {
+  animation: pillarPuzzleWiggle 3.6s ease-in-out infinite;
+}
+
+.animate-pillar-teacher {
+  animation: pillarTeacherBreathe 3.4s ease-in-out infinite;
+}
+
+.animate-pillar-heart {
+  animation: pillarHeartBeat 2.6s ease-in-out infinite;
+}
+
+/* =========================================================
+   4. INTERACTIVE DOODLE & BUBBLE CLASSES
+========================================================= */
+
+.floating-bubble {
+  position: absolute;
+  pointer-events: none;
+  animation: bubbleFloat var(--duration, 5s) ease-in-out infinite;
+  z-index: 3;
+}
+
+.floating-pencil {
+  position: absolute;
+  pointer-events: none;
+  animation: pencilFloat 4s ease-in-out infinite;
+  z-index: 6;
+}
+
+.floating-star {
+  position: absolute;
+  pointer-events: none;
+  animation: starSpin 5s linear infinite;
+  z-index: 4;
+}
+
+.floating-cloud {
+  position: absolute;
+  pointer-events: none;
+  animation: cloudMove 7s ease-in-out infinite;
+  z-index: 2;
+}
+
+.floating-butterfly {
+  position: absolute;
+  pointer-events: none;
+  animation: butterflyFlutter 4.5s ease-in-out infinite;
+  z-index: 6;
+}
+
+.floating-plane {
+  position: absolute;
+  pointer-events: none;
+  animation: planeGlide 6s ease-in-out infinite;
+  z-index: 5;
+}
+
+.floating-sun {
+  position: absolute;
+  pointer-events: none;
+  animation: sunPulse 6s ease-in-out infinite;
+  z-index: 2;
+}
+
+.floating-heart {
+  position: absolute;
+  pointer-events: none;
+  animation: heartBeat 2.2s ease-in-out infinite;
+  z-index: 4;
+}
+
+.floating-book {
+  position: absolute;
+  pointer-events: none;
+  animation: bookFloat 4.8s ease-in-out infinite;
+  z-index: 5;
+}
+
+.floating-blocks {
+  position: absolute;
+  pointer-events: none;
+  animation: blocksWobble 4.2s ease-in-out infinite;
+  z-index: 5;
+}
+
+.floating-rainbow {
+  position: absolute;
+  pointer-events: none;
+  animation: rainbowFloat 5.5s ease-in-out infinite;
+  z-index: 3;
+}
+
+.floating-flower {
+  position: absolute;
+  pointer-events: none;
+  animation: flowerSway 3.8s ease-in-out infinite;
+  transform-origin: bottom center;
+  z-index: 4;
+}
+
+.floating-scribble {
+  position: absolute;
+  pointer-events: none;
+  animation: scribblePulse 5s ease-in-out infinite;
+  z-index: 2;
+}
+
+
+/* =========================================================
+   5. BUBBLES WEBSITE COMPONENT STYLING
+========================================================= */
+
+.bubble {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: bubbleFloat var(--duration, 5s) ease-in-out infinite;
+}
+
+.wave {
+  position: absolute;
+  bottom: -2px;
+  left: -5%;
+  width: 110%;
+  height: 90px;
+  background: var(--cream);
+  border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+  z-index: 5;
+}
+
+.wave-inverted {
+  position: absolute;
+  top: -2px;
+  left: -5%;
+  width: 110%;
+  height: 80px;
+  background: var(--cream);
+  border-radius: 0 0 50% 50% / 0 0 100% 100%;
+  z-index: 5;
+}
+
+.hero-photo-ring {
+  width: min(470px, 85vw);
+  height: min(470px, 85vw);
+  object-fit: cover;
+  border-radius: 50%;
+  border: 12px solid rgba(255, 255, 255, 0.85);
+  box-shadow: var(--shadow);
+  animation: imageFloat 6s ease-in-out infinite;
+}
+
+/* Scroll reveal utility */
+.reveal {
+  opacity: 0;
+  transform: translateY(35px);
+  transition: opacity 0.8s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+::-webkit-scrollbar-track {
+  background: #F5E9D8;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #21B8AF;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #168F89;
+}
+
+/* =========================================================
+   6. FLYING ANIMALS & FLOATING EMOJI ANIMATIONS
+========================================================= */
+
+@keyframes butterflyFlight {
+  0%, 100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  25% {
+    transform: translate(16px, -20px) rotate(6deg);
+  }
+  50% {
+    transform: translate(32px, -8px) rotate(-4deg);
+  }
+  75% {
+    transform: translate(14px, -26px) rotate(3deg);
+  }
+}
+
+@keyframes wingFlapLeft {
+  0%, 100% {
+    transform: scaleX(1);
+  }
+  50% {
+    transform: scaleX(0.25);
+  }
+}
+
+@keyframes wingFlapRight {
+  0%, 100% {
+    transform: scaleX(1);
+  }
+  50% {
+    transform: scaleX(0.25);
+  }
+}
+
+@keyframes beeBuzzFlight {
+  0%, 100% {
+    transform: translate(0, 0) rotate(-3deg);
+  }
+  25% {
+    transform: translate(12px, -15px) rotate(5deg);
+  }
+  50% {
+    transform: translate(-10px, -25px) rotate(-2deg);
+  }
+  75% {
+    transform: translate(8px, -10px) rotate(4deg);
+  }
+}
+
+@keyframes balloonFloatDrift {
+  0%, 100% {
+    transform: translateY(0) rotate(-3deg);
+  }
+  50% {
+    transform: translateY(-22px) rotate(4deg);
+  }
+}
+
+@keyframes animalPeekaboo {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-12px) rotate(3deg);
+  }
+}
+
+@keyframes emojiFloatBob {
+  0%, 100% {
+    transform: translateY(0) scale(1) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-14px) scale(1.08) rotate(6deg);
+  }
+}
+
+@keyframes rainbowShimmer {
+  0%, 100% {
+    opacity: 0.85;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+}
+
+.animate-butterfly-flight {
+  animation: butterflyFlight 6s ease-in-out infinite;
+}
+
+.animate-wing-left {
+  animation: wingFlapLeft 0.35s ease-in-out infinite;
+  transform-origin: right center;
+}
+
+.animate-wing-right {
+  animation: wingFlapRight 0.35s ease-in-out infinite;
+  transform-origin: left center;
+}
+
+.animate-bee-buzz {
+  animation: beeBuzzFlight 4.5s ease-in-out infinite;
+}
+
+.animate-balloon-drift {
+  animation: balloonFloatDrift 5s ease-in-out infinite;
+}
+
+.animate-animal-peek {
+  animation: animalPeekaboo 4s ease-in-out infinite;
+}
+
+.animate-emoji-float {
+  animation: emojiFloatBob 3.5s ease-in-out infinite;
+}
+
+.animate-rainbow-shimmer {
+  animation: rainbowShimmer 4s ease-in-out infinite;
+}

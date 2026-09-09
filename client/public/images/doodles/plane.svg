@@ -1,0 +1,8 @@
+<svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M10 80 Q25 85 40 70 T70 45" stroke="#FFFFFF" stroke-width="2" stroke-dasharray="3 3" stroke-opacity="0.7" />
+  <g transform="rotate(20 65 40)">
+    <polygon points="65,15 40,65 62,55" fill="#FFFFFF" />
+    <polygon points="65,15 62,55 88,65" fill="#BDF3EE" />
+    <polygon points="62,55 65,70 68,55" fill="#21B8AF" />
+  </g>
+</svg>
