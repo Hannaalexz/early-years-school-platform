@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { Badge } from '../../components/common/Badge.js';
 import { Button } from '../../components/common/Button.js';
+import { Pagination } from '../../components/common/Pagination.js';
 import { api } from '../../services/api.js';
 
 interface PortalAccessPageProps {
@@ -25,6 +26,8 @@ export const PortalAccessPage: React.FC<PortalAccessPageProps> = ({ onOpenPortal
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(8);
 
   const loadParents = async () => {
     setLoading(true);
@@ -101,92 +104,107 @@ export const PortalAccessPage: React.FC<PortalAccessPageProps> = ({ onOpenPortal
             Loading portal access list...
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
-              <thead className="bg-ivory-100/70 text-ink-600 uppercase text-[10px] tracking-wider font-bold border-b border-ivory-200">
-                <tr>
-                  <th className="px-5 py-3">Parent Name</th>
-                  <th className="px-4 py-3">Contact</th>
-                  <th className="px-4 py-3">Portal Access Code</th>
-                  <th className="px-4 py-3">Security PIN</th>
-                  <th className="px-4 py-3">Linked Children</th>
-                  <th className="px-4 py-3 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-ivory-200">
-                {parents.map((p) => {
-                  const code = p.portal_code || `PAR-${p.id.substring(0, 4).toUpperCase()}`;
-                  const pin = p.portal_pin || '1234';
-                  const isCopied = copiedId === p.id;
+          <>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs">
+                <thead className="bg-ivory-100/70 text-ink-600 uppercase text-[10px] tracking-wider font-bold border-b border-ivory-200">
+                  <tr>
+                    <th className="px-5 py-3">Parent Name</th>
+                    <th className="px-4 py-3">Contact</th>
+                    <th className="px-4 py-3">Portal Access Code</th>
+                    <th className="px-4 py-3">Security PIN</th>
+                    <th className="px-4 py-3">Linked Children</th>
+                    <th className="px-4 py-3 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-ivory-200">
+                  {parents
+                    .slice((currentPage - 1) * pageSize, currentPage * pageSize)
+                    .map((p) => {
+                    const code = p.portal_code || `PAR-${p.id.substring(0, 4).toUpperCase()}`;
+                    const pin = p.portal_pin || '1234';
+                    const isCopied = copiedId === p.id;
 
-                  return (
-                    <tr key={p.id} className="hover:bg-ivory-50/70 transition-colors">
-                      <td className="px-5 py-3.5">
-                        <div className="flex items-center gap-2.5">
-                          <div className="w-8 h-8 rounded-full bg-amber-100 text-amber-900 font-bold flex items-center justify-center text-xs">
-                            {p.first_name[0]}{p.last_name[0]}
+                    return (
+                      <tr key={p.id} className="hover:bg-ivory-50/70 transition-colors">
+                        <td className="px-5 py-3.5">
+                          <div className="flex items-center gap-2.5">
+                            <div className="w-8 h-8 rounded-full bg-amber-100 text-amber-900 font-bold flex items-center justify-center text-xs">
+                              {p.first_name[0]}{p.last_name[0]}
+                            </div>
+                            <div>
+                              <p className="font-bold text-ink-900">{p.first_name} {p.last_name}</p>
+                              <p className="text-[10px] text-ink-500">{p.occupation || 'Parent'}</p>
+                            </div>
                           </div>
-                          <div>
-                            <p className="font-bold text-ink-900">{p.first_name} {p.last_name}</p>
-                            <p className="text-[10px] text-ink-500">{p.occupation || 'Parent'}</p>
+                        </td>
+
+                        <td className="px-4 py-3.5">
+                          <p className="text-ink-800 font-medium">{p.phone}</p>
+                          <p className="text-[10px] text-ink-400">{p.email || 'No email'}</p>
+                        </td>
+
+                        <td className="px-4 py-3.5">
+                          <span className="px-2.5 py-1 rounded-lg bg-ivory-100 border border-ivory-300 font-mono font-bold text-ink-900 text-[11px] tracking-wider">
+                            {code}
+                          </span>
+                        </td>
+
+                        <td className="px-4 py-3.5">
+                          <span className="px-2 py-0.5 rounded-md bg-forest-50 border border-forest-200 font-mono font-bold text-forest-800 text-xs">
+                            {pin}
+                          </span>
+                        </td>
+
+                        <td className="px-4 py-3.5">
+                          <div className="flex flex-wrap gap-1">
+                            {p.children && p.children.length > 0 ? (
+                              p.children.map((c: any) => (
+                                <span
+                                  key={c.id}
+                                  className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-800"
+                                >
+                                  {c.first_name}
+                                </span>
+                              ))
+                            ) : (
+                              <span className="text-ink-400 italic text-[10px]">None linked</span>
+                            )}
                           </div>
-                        </div>
-                      </td>
+                        </td>
 
-                      <td className="px-4 py-3.5">
-                        <p className="font-mono text-ink-800">{p.phone}</p>
-                        <p className="text-[10px] text-ink-500">{p.email}</p>
-                      </td>
+                        <td className="px-4 py-3.5 text-right">
+                          <button
+                            onClick={() => copyCredentials(p)}
+                            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold transition ${
+                              isCopied
+                                ? 'bg-emerald-100 text-emerald-800'
+                                : 'bg-ivory-100 hover:bg-ivory-200 text-ink-700'
+                            }`}
+                          >
+                            {isCopied ? <Check size={12} /> : <Copy size={12} />}
+                            <span>{isCopied ? 'Copied' : 'Copy Card'}</span>
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
 
-                      <td className="px-4 py-3.5">
-                        <span className="font-mono font-bold bg-ivory-100 px-2 py-1 rounded-md text-ink-900 border border-ivory-200">
-                          {code}
-                        </span>
-                      </td>
-
-                      <td className="px-4 py-3.5">
-                        <span className="font-mono bg-sage-100 text-forest-900 px-2 py-1 rounded-md font-bold">
-                          {pin}
-                        </span>
-                      </td>
-
-                      <td className="px-4 py-3.5">
-                        <div className="flex flex-wrap gap-1">
-                          {p.children && p.children.length > 0 ? (
-                            p.children.map((c: any) => (
-                              <span
-                                key={c.child_id}
-                                className="inline-flex items-center gap-1 bg-ivory-100 text-ink-800 px-2 py-0.5 rounded-md text-[10px] font-medium border border-ivory-200"
-                              >
-                                <Baby size={10} className="text-forest-700" />
-                                {c.child_name}
-                              </span>
-                            ))
-                          ) : (
-                            <span className="text-ink-400 italic text-[10px]">None linked</span>
-                          )}
-                        </div>
-                      </td>
-
-                      <td className="px-4 py-3.5 text-right">
-                        <button
-                          onClick={() => copyCredentials(p)}
-                          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold transition ${
-                            isCopied
-                              ? 'bg-emerald-100 text-emerald-800'
-                              : 'bg-ivory-100 hover:bg-ivory-200 text-ink-700'
-                          }`}
-                        >
-                          {isCopied ? <Check size={12} /> : <Copy size={12} />}
-                          <span>{isCopied ? 'Copied' : 'Copy Card'}</span>
-                        </button>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+            <div className="px-5 py-2.5 border-t border-ivory-200 bg-ivory-50/50">
+              <Pagination
+                currentPage={currentPage}
+                totalItems={parents.length}
+                pageSize={pageSize}
+                onPageChange={setCurrentPage}
+                onPageSizeChange={setPageSize}
+                pageSizeOptions={[8, 16, 24]}
+                itemLabel="access cards"
+              />
+            </div>
+          </>
         )}
       </div>
     </div>

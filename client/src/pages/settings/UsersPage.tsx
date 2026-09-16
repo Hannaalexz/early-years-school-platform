@@ -5,6 +5,7 @@ import { Button } from '../../components/common/Button.js';
 import { Input, Select } from '../../components/common/Input.js';
 import { Badge } from '../../components/common/Badge.js';
 import { Modal } from '../../components/common/Modal.js';
+import { Pagination } from '../../components/common/Pagination.js';
 import { api } from '../../services/api.js';
 
 export const UsersPage: React.FC = () => {
@@ -15,6 +16,8 @@ export const UsersPage: React.FC = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(8);
 
   const [newUser, setNewUser] = useState({
     first_name: '',
@@ -35,6 +38,7 @@ export const UsersPage: React.FC = () => {
     setLoading(false);
     if (res.success && res.data) {
       setUsers(res.data);
+      setCurrentPage(1);
     }
   };
 
@@ -148,7 +152,9 @@ export const UsersPage: React.FC = () => {
               </tr>
             </thead>
             <tbody className="divide-y border-ivory-200">
-              {users.map((u) => (
+              {users
+                .slice((currentPage - 1) * pageSize, currentPage * pageSize)
+                .map((u) => (
                 <tr key={u.id} className="hover:bg-ivory-50 transition-colors">
                   <td className="py-3">
                     <div className="flex items-center gap-2.5">
@@ -194,6 +200,16 @@ export const UsersPage: React.FC = () => {
             </tbody>
           </table>
         </div>
+
+        <Pagination
+          currentPage={currentPage}
+          totalItems={users.length}
+          pageSize={pageSize}
+          onPageChange={setCurrentPage}
+          onPageSizeChange={setPageSize}
+          pageSizeOptions={[8, 16, 24]}
+          itemLabel="users"
+        />
       </Card>
 
       {/* Add User Modal */}

@@ -18,6 +18,7 @@ import { Button } from '../../components/common/Button.js';
 import { Badge } from '../../components/common/Badge.js';
 import { Input, Select } from '../../components/common/Input.js';
 import { Modal } from '../../components/common/Modal.js';
+import { Pagination } from '../../components/common/Pagination.js';
 import { api } from '../../services/api.js';
 
 interface AllChildrenPageProps {
@@ -32,6 +33,8 @@ export const AllChildrenPage: React.FC<AllChildrenPageProps> = ({ onSelectChild 
   const [programFilter, setProgramFilter] = useState('');
   const [allergyFilter, setAllergyFilter] = useState(false);
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(8);
 
   const [classrooms, setClassrooms] = useState<any[]>([]);
   const [programs, setPrograms] = useState<any[]>([]);
@@ -80,11 +83,13 @@ export const AllChildrenPage: React.FC<AllChildrenPageProps> = ({ onSelectChild 
   }, []);
 
   useEffect(() => {
+    setCurrentPage(1);
     loadChildren();
   }, [classroomFilter, programFilter, allergyFilter]);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setCurrentPage(1);
     loadChildren();
   };
 
@@ -220,132 +225,156 @@ export const AllChildrenPage: React.FC<AllChildrenPageProps> = ({ onSelectChild 
 
       {/* Grid View */}
       {viewMode === 'grid' ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {children.map((child) => (
-            <div
-              key={child.id}
-              onClick={() => onSelectChild(child.id)}
-              className="bg-white rounded-3xl p-5 border border-ivory-300 shadow-subtle hover:border-forest-600 hover:shadow-warm transition-all cursor-pointer flex flex-col justify-between group"
-            >
-              <div>
-                {/* Card Top: Photo/Initials + Program Tag */}
-                <div className="flex items-start justify-between">
-                  <div className="w-14 h-14 rounded-2xl bg-terracotta-100 text-terracotta-600 font-extrabold text-xl flex items-center justify-center border border-terracotta-200 shadow-xs group-hover:scale-105 transition-transform">
-                    {child.first_name[0]}
+        <div className="space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {children.slice((currentPage - 1) * pageSize, currentPage * pageSize).map((child) => (
+              <div
+                key={child.id}
+                onClick={() => onSelectChild(child.id)}
+                className="bg-white rounded-3xl p-5 border border-ivory-300 shadow-subtle hover:border-forest-600 hover:shadow-warm transition-all cursor-pointer flex flex-col justify-between group"
+              >
+                <div>
+                  {/* Card Top: Photo/Initials + Program Tag */}
+                  <div className="flex items-start justify-between">
+                    <div className="w-14 h-14 rounded-2xl bg-terracotta-100 text-terracotta-600 font-extrabold text-xl flex items-center justify-center border border-terracotta-200 shadow-xs group-hover:scale-105 transition-transform">
+                      {child.first_name[0]}
+                    </div>
+                    <span
+                      className="text-[10px] font-bold px-2 py-0.5 rounded-full"
+                      style={{
+                        backgroundColor: `${child.program_color || '#4A6B53'}15`,
+                        color: child.program_color || '#4A6B53',
+                      }}
+                    >
+                      {child.program_name || 'Early Years'}
+                    </span>
                   </div>
-                  <span
-                    className="text-[10px] font-bold px-2 py-0.5 rounded-full"
-                    style={{
-                      backgroundColor: `${child.program_color || '#4A6B53'}15`,
-                      color: child.program_color || '#4A6B53',
-                    }}
-                  >
-                    {child.program_name || 'Early Years'}
+
+                  {/* Child Name & Age (#8 Specification) */}
+                  <div className="mt-3">
+                    <h3 className="font-extrabold text-base text-ink-900 group-hover:text-forest-800 transition-colors">
+                      {child.first_name} {child.middle_name ? `${child.middle_name[0]}. ` : ''}{child.last_name}
+                    </h3>
+                    {child.preferred_name && child.preferred_name !== child.first_name && (
+                      <p className="text-[11px] text-ink-400 italic">"{child.preferred_name}"</p>
+                    )}
+                    <p className="text-xs font-semibold text-forest-700 mt-1">
+                      Age: {child.calculated_age?.formatted}
+                    </p>
+                    <p className="text-[11px] text-ink-500 mt-0.5">
+                      {child.classroom_name || 'Unassigned Room'}
+                    </p>
+                  </div>
+
+                  {/* Care & Allergy Badges */}
+                  <div className="mt-3 flex flex-wrap gap-1.5">
+                    {child.allergies && child.allergies.length > 0 ? (
+                      child.allergies.map((a: string) => (
+                        <span
+                          key={a}
+                          className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-50 text-amber-800 border border-amber-200 text-[10px] font-bold"
+                        >
+                          <AlertTriangle size={10} className="text-amber-600" />
+                          {a}
+                        </span>
+                      ))
+                    ) : (
+                      <span className="text-[10px] text-sage-600 font-medium">✓ No allergies</span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Card Footer: Toilet Status + Action CTA */}
+                <div className="mt-4 pt-3 border-t border-ivory-200 flex items-center justify-between text-xs">
+                  <span className="text-[10px] text-ink-400 capitalize">
+                    Toilet: {child.toilet_training_status?.replace('_', ' ')}
+                  </span>
+                  <span className="text-[11px] font-bold text-forest-800 group-hover:underline flex items-center gap-1">
+                    Profile <Eye size={12} />
                   </span>
                 </div>
-
-                {/* Child Name & Age (#8 Specification) */}
-                <div className="mt-3">
-                  <h3 className="font-extrabold text-base text-ink-900 group-hover:text-forest-800 transition-colors">
-                    {child.first_name} {child.middle_name ? `${child.middle_name[0]}. ` : ''}{child.last_name}
-                  </h3>
-                  {child.preferred_name && child.preferred_name !== child.first_name && (
-                    <p className="text-[11px] text-ink-400 italic">"{child.preferred_name}"</p>
-                  )}
-                  <p className="text-xs font-semibold text-forest-700 mt-1">
-                    Age: {child.calculated_age?.formatted}
-                  </p>
-                  <p className="text-[11px] text-ink-500 mt-0.5">
-                    {child.classroom_name || 'Unassigned Room'}
-                  </p>
-                </div>
-
-                {/* Care & Allergy Badges */}
-                <div className="mt-3 flex flex-wrap gap-1.5">
-                  {child.allergies && child.allergies.length > 0 ? (
-                    child.allergies.map((a: string) => (
-                      <span
-                        key={a}
-                        className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-50 text-amber-800 border border-amber-200 text-[10px] font-bold"
-                      >
-                        <AlertTriangle size={10} className="text-amber-600" />
-                        {a}
-                      </span>
-                    ))
-                  ) : (
-                    <span className="text-[10px] text-sage-600 font-medium">✓ No allergies</span>
-                  )}
-                </div>
               </div>
+            ))}
+          </div>
 
-              {/* Card Footer: Toilet Status + Action CTA */}
-              <div className="mt-4 pt-3 border-t border-ivory-200 flex items-center justify-between text-xs">
-                <span className="text-[10px] text-ink-400 capitalize">
-                  Toilet: {child.toilet_training_status?.replace('_', ' ')}
-                </span>
-                <span className="text-[11px] font-bold text-forest-800 group-hover:underline flex items-center gap-1">
-                  Profile <Eye size={12} />
-                </span>
-              </div>
-            </div>
-          ))}
+          <Pagination
+            currentPage={currentPage}
+            totalItems={children.length}
+            pageSize={pageSize}
+            onPageChange={setCurrentPage}
+            onPageSizeChange={setPageSize}
+            pageSizeOptions={[8, 12, 24]}
+            itemLabel="children"
+          />
         </div>
       ) : (
         /* Table View */
-        <Card>
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
-              <thead className="border-b border-ivory-200 text-ink-500 font-semibold uppercase tracking-wider text-[10px]">
-                <tr>
-                  <th className="pb-3">Child</th>
-                  <th className="pb-3">Age</th>
-                  <th className="pb-3">Classroom</th>
-                  <th className="pb-3">Program</th>
-                  <th className="pb-3">Allergies / Diet</th>
-                  <th className="pb-3">Toilet Training</th>
-                  <th className="pb-3 text-right">Action</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-ivory-200">
-                {children.map((c) => (
-                  <tr
-                    key={c.id}
-                    onClick={() => onSelectChild(c.id)}
-                    className="hover:bg-ivory-50 transition-colors cursor-pointer"
-                  >
-                    <td className="py-3 font-bold text-ink-900">
-                      <div className="flex items-center gap-2.5">
-                        <div className="w-7 h-7 rounded-xl bg-terracotta-100 text-terracotta-700 font-extrabold text-xs flex items-center justify-center">
-                          {c.first_name[0]}
-                        </div>
-                        <div>
-                          <p className="font-bold text-ink-900">{c.first_name} {c.last_name}</p>
-                          <p className="text-[10px] text-ink-400">{c.admission_number}</p>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="py-3 text-forest-800 font-semibold">{c.calculated_age?.formatted}</td>
-                    <td className="py-3 text-ink-700">{c.classroom_name}</td>
-                    <td className="py-3 text-ink-500">{c.program_name}</td>
-                    <td className="py-3">
-                      {c.allergies?.length ? (
-                        <span className="px-2 py-0.5 rounded bg-amber-50 text-amber-800 font-bold text-[10px] border border-amber-200">
-                          ⚠ {c.allergies.join(', ')}
-                        </span>
-                      ) : (
-                        <span className="text-ink-400 text-[10px]">None</span>
-                      )}
-                    </td>
-                    <td className="py-3 capitalize text-ink-600">{c.toilet_training_status?.replace('_', ' ')}</td>
-                    <td className="py-3 text-right">
-                      <Button variant="ghost" size="sm">View 360°</Button>
-                    </td>
+        <div className="space-y-4">
+          <Card>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs">
+                <thead className="border-b border-ivory-200 text-ink-500 font-semibold uppercase tracking-wider text-[10px]">
+                  <tr>
+                    <th className="pb-3">Child</th>
+                    <th className="pb-3">Age</th>
+                    <th className="pb-3">Classroom</th>
+                    <th className="pb-3">Program</th>
+                    <th className="pb-3">Allergies / Diet</th>
+                    <th className="pb-3">Toilet Training</th>
+                    <th className="pb-3 text-right">Action</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </Card>
+                </thead>
+                <tbody className="divide-y divide-ivory-200">
+                  {children.slice((currentPage - 1) * pageSize, currentPage * pageSize).map((c) => (
+                    <tr
+                      key={c.id}
+                      onClick={() => onSelectChild(c.id)}
+                      className="hover:bg-ivory-50 transition-colors cursor-pointer"
+                    >
+                      <td className="py-3 font-bold text-ink-900">
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-7 h-7 rounded-xl bg-terracotta-100 text-terracotta-700 font-extrabold text-xs flex items-center justify-center">
+                            {c.first_name[0]}
+                          </div>
+                          <div>
+                            <p className="font-bold text-ink-900">{c.first_name} {c.last_name}</p>
+                            <p className="text-[10px] text-ink-400">{c.admission_number}</p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="py-3 text-forest-800 font-semibold">{c.calculated_age?.formatted}</td>
+                      <td className="py-3 text-ink-700">{c.classroom_name}</td>
+                      <td className="py-3 text-ink-500">{c.program_name}</td>
+                      <td className="py-3">
+                        {c.allergies?.length ? (
+                          <span className="px-2 py-0.5 rounded bg-amber-50 text-amber-800 font-bold text-[10px] border border-amber-200">
+                            ⚠ {c.allergies.join(', ')}
+                          </span>
+                        ) : (
+                          <span className="text-ink-400 text-[10px]">None</span>
+                        )}
+                      </td>
+                      <td className="py-3 capitalize text-ink-600">{c.toilet_training_status?.replace('_', ' ')}</td>
+                      <td className="py-3 text-right">
+                        <Button variant="ghost" size="sm">View 360°</Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </Card>
+
+          <Pagination
+            currentPage={currentPage}
+            totalItems={children.length}
+            pageSize={pageSize}
+            onPageChange={setCurrentPage}
+            onPageSizeChange={setPageSize}
+            pageSizeOptions={[8, 12, 24]}
+            itemLabel="children"
+          />
+        </div>
       )}
 
       {/* Registration Modal */}

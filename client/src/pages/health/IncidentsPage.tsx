@@ -14,6 +14,7 @@ import {
   X
 } from 'lucide-react';
 import { api } from '../../services/api.js';
+import { Pagination } from '../../components/common/Pagination.js';
 
 interface Incident {
   id: string;
@@ -68,6 +69,8 @@ export const IncidentsPage: React.FC = () => {
   const [children, setChildren] = useState<any[]>([]);
   const [incidents, setIncidents] = useState<Incident[]>(INITIAL_INCIDENTS);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(4);
 
   // Form State
   const [formChildId, setFormChildId] = useState('');
@@ -141,9 +144,11 @@ export const IncidentsPage: React.FC = () => {
         </button>
       </div>
 
-      {/* Incident List */}
+      {/* Incidents Feed */}
       <div className="space-y-4">
-        {incidents.map((inc) => (
+        {incidents
+          .slice((currentPage - 1) * pageSize, currentPage * pageSize)
+          .map((inc) => (
           <div
             key={inc.id}
             className="bg-white rounded-3xl p-5 border border-ivory-300 shadow-xs hover:border-ivory-400 transition space-y-4"
@@ -209,6 +214,16 @@ export const IncidentsPage: React.FC = () => {
             </div>
           </div>
         ))}
+
+        <Pagination
+          currentPage={currentPage}
+          totalItems={incidents.length}
+          pageSize={pageSize}
+          onPageChange={setCurrentPage}
+          onPageSizeChange={setPageSize}
+          pageSizeOptions={[4, 8, 12]}
+          itemLabel="incident records"
+        />
       </div>
 
       {/* Add Modal */}

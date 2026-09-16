@@ -13,6 +13,7 @@ import {
   X
 } from 'lucide-react';
 import { api } from '../../services/api.js';
+import { Pagination } from '../../components/common/Pagination.js';
 
 interface Observation {
   id: string;
@@ -44,6 +45,8 @@ export const ObservationsPage: React.FC = () => {
   const [selectedDomain, setSelectedDomain] = useState<string>('All Domains');
   const [searchQuery, setSearchQuery] = useState('');
   const [showAddModal, setShowAddModal] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(5);
 
   // Form state
   const [formChildId, setFormChildId] = useState('');
@@ -234,54 +237,68 @@ export const ObservationsPage: React.FC = () => {
             No observations match your current filter. Click "Record New Observation" above.
           </div>
         ) : (
-          filteredObservations.map((obs) => (
-            <div
-              key={obs.id}
-              className="bg-white p-5 rounded-3xl border border-ivory-300 shadow-xs hover:border-[#C3EFEB] transition-all space-y-3"
-            >
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-2xl bg-[#E0F7F4] text-[#0B4E49] font-bold flex items-center justify-center text-sm border border-[#C3EFEB]">
-                    {obs.childName[0]}
+          <>
+            {filteredObservations
+              .slice((currentPage - 1) * pageSize, currentPage * pageSize)
+              .map((obs) => (
+              <div
+                key={obs.id}
+                className="bg-white p-5 rounded-3xl border border-ivory-300 shadow-xs hover:border-[#C3EFEB] transition-all space-y-3"
+              >
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-2xl bg-[#E0F7F4] text-[#0B4E49] font-bold flex items-center justify-center text-sm border border-[#C3EFEB]">
+                      {obs.childName[0]}
+                    </div>
+                    <div>
+                      <h3 className="font-extrabold text-sm text-ink-900">{obs.childName}</h3>
+                      <p className="text-[11px] text-ink-500">
+                        {obs.classroom} • Observed by {obs.teacherName} on {obs.date}
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="font-extrabold text-sm text-ink-900">{obs.childName}</h3>
-                    <p className="text-[11px] text-ink-500">
-                      {obs.classroom} • Observed by {obs.teacherName} on {obs.date}
-                    </p>
+
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] uppercase font-bold tracking-wider text-[#0B4E49] bg-[#E0F7F4] px-2.5 py-0.5 rounded-full border border-[#C3EFEB]">
+                      {obs.domain}
+                    </span>
+                    <span
+                      className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border ${getStatusBadge(
+                        obs.status
+                      )}`}
+                    >
+                      {obs.status === 'Achieved' ? '✓ ' : obs.status === 'Developing' ? '◐ ' : '○ '}
+                      {obs.status}
+                    </span>
+                    <button
+                      onClick={() => handleDelete(obs.id)}
+                      title="Delete observation"
+                      className="p-1.5 text-ink-300 hover:text-dustyrose-600 rounded-lg transition"
+                    >
+                      <Trash2 size={13} />
+                    </button>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2">
-                  <span className="text-[10px] uppercase font-bold tracking-wider text-[#0B4E49] bg-[#E0F7F4] px-2.5 py-0.5 rounded-full border border-[#C3EFEB]">
-                    {obs.domain}
-                  </span>
-                  <span
-                    className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border ${getStatusBadge(
-                      obs.status
-                    )}`}
-                  >
-                    {obs.status === 'Achieved' ? '✓ ' : obs.status === 'Developing' ? '◐ ' : '○ '}
-                    {obs.status}
-                  </span>
-                  <button
-                    onClick={() => handleDelete(obs.id)}
-                    title="Delete observation"
-                    className="p-1.5 text-ink-300 hover:text-dustyrose-600 rounded-lg transition"
-                  >
-                    <Trash2 size={13} />
-                  </button>
+                <div className="bg-ivory-50 p-3 rounded-2xl border border-ivory-200 space-y-1">
+                  <p className="text-xs font-bold text-ink-900">
+                    Target Skill: <span className="font-normal text-ink-700">{obs.skill}</span>
+                  </p>
+                  <p className="text-xs text-ink-800 leading-relaxed italic">"{obs.note}"</p>
                 </div>
               </div>
+            ))}
 
-              <div className="bg-ivory-50 p-3 rounded-2xl border border-ivory-200 space-y-1">
-                <p className="text-xs font-bold text-ink-900">
-                  Target Skill: <span className="font-normal text-ink-700">{obs.skill}</span>
-                </p>
-                <p className="text-xs text-ink-800 leading-relaxed italic">"{obs.note}"</p>
-              </div>
-            </div>
-          ))
+            <Pagination
+              currentPage={currentPage}
+              totalItems={filteredObservations.length}
+              pageSize={pageSize}
+              onPageChange={setCurrentPage}
+              onPageSizeChange={setPageSize}
+              pageSizeOptions={[5, 10, 15]}
+              itemLabel="observations"
+            />
+          </>
         )}
       </div>
 

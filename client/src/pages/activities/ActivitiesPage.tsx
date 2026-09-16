@@ -11,6 +11,7 @@ import {
   Trash2,
   X
 } from 'lucide-react';
+import { Pagination } from '../../components/common/Pagination.js';
 
 interface ActivityItem {
   id: string;
@@ -71,6 +72,8 @@ export const ActivitiesPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedClassroom, setSelectedClassroom] = useState('All');
   const [showAddModal, setShowAddModal] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(4);
 
   // Form State
   const [formTitle, setFormTitle] = useState('');
@@ -177,57 +180,71 @@ export const ActivitiesPage: React.FC = () => {
       </div>
 
       {/* Activities Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {filtered.map((act) => (
-          <div
-            key={act.id}
-            className="bg-white rounded-3xl p-5 border border-ivory-300 shadow-xs hover:border-[#C3EFEB] transition-all space-y-3 flex flex-col justify-between"
-          >
-            <div className="space-y-2.5">
-              <div className="flex items-start justify-between gap-2">
-                <div>
-                  <h3 className="text-sm font-extrabold text-ink-900">{act.title}</h3>
-                  <p className="text-[11px] text-ink-500 mt-0.5">
-                    {act.classroom} • {act.date}
-                  </p>
+      <div className="space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {filtered
+            .slice((currentPage - 1) * pageSize, currentPage * pageSize)
+            .map((act) => (
+            <div
+              key={act.id}
+              className="bg-white rounded-3xl p-5 border border-ivory-300 shadow-xs hover:border-[#C3EFEB] transition-all space-y-3 flex flex-col justify-between"
+            >
+              <div className="space-y-2.5">
+                <div className="flex items-start justify-between gap-2">
+                  <div>
+                    <h3 className="text-sm font-extrabold text-ink-900">{act.title}</h3>
+                    <p className="text-[11px] text-ink-500 mt-0.5">
+                      {act.classroom} • {act.date}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <span className="inline-flex items-center gap-1 text-[10px] font-bold text-ink-600 bg-ivory-100 px-2 py-0.5 rounded-md border border-ivory-200">
+                      <Camera size={11} className="text-[#21B8AF]" /> {act.photoCount} Photos
+                    </span>
+                    <button
+                      onClick={() => handleDelete(act.id)}
+                      className="p-1 text-ink-300 hover:text-dustyrose-600 rounded transition"
+                    >
+                      <Trash2 size={13} />
+                    </button>
+                  </div>
                 </div>
-                <div className="flex items-center gap-1">
-                  <span className="inline-flex items-center gap-1 text-[10px] font-bold text-ink-600 bg-ivory-100 px-2 py-0.5 rounded-md border border-ivory-200">
-                    <Camera size={11} className="text-[#21B8AF]" /> {act.photoCount} Photos
-                  </span>
-                  <button
-                    onClick={() => handleDelete(act.id)}
-                    className="p-1 text-ink-300 hover:text-dustyrose-600 rounded transition"
-                  >
-                    <Trash2 size={13} />
-                  </button>
+
+                <div className="flex flex-wrap gap-1.5">
+                  {act.developmentAreas.map((area) => (
+                    <span
+                      key={area}
+                      className="text-[10px] font-bold text-[#0B4E49] bg-[#E0F7F4] px-2.5 py-0.5 rounded-full border border-[#C3EFEB]"
+                    >
+                      🌱 {area}
+                    </span>
+                  ))}
                 </div>
+
+                <p className="text-xs text-ink-700 leading-relaxed bg-ivory-50 p-3 rounded-2xl border border-ivory-200">
+                  {act.notes}
+                </p>
               </div>
 
-              <div className="flex flex-wrap gap-1.5">
-                {act.developmentAreas.map((area) => (
-                  <span
-                    key={area}
-                    className="text-[10px] font-bold text-[#0B4E49] bg-[#E0F7F4] px-2.5 py-0.5 rounded-full border border-[#C3EFEB]"
-                  >
-                    🌱 {area}
-                  </span>
-                ))}
+              <div className="pt-2 border-t border-ivory-200 flex items-center justify-between text-[11px] text-ink-500">
+                <span>Tags: {act.tags.join(', ')}</span>
+                <span className="text-emerald-700 font-bold flex items-center gap-1">
+                  <CheckCircle2 size={12} /> Synced to Portal
+                </span>
               </div>
-
-              <p className="text-xs text-ink-700 leading-relaxed bg-ivory-50 p-3 rounded-2xl border border-ivory-200">
-                {act.notes}
-              </p>
             </div>
+          ))}
+        </div>
 
-            <div className="pt-2 border-t border-ivory-200 flex items-center justify-between text-[11px] text-ink-500">
-              <span>Tags: {act.tags.join(', ')}</span>
-              <span className="text-emerald-700 font-bold flex items-center gap-1">
-                <CheckCircle2 size={12} /> Synced to Portal
-              </span>
-            </div>
-          </div>
-        ))}
+        <Pagination
+          currentPage={currentPage}
+          totalItems={filtered.length}
+          pageSize={pageSize}
+          onPageChange={setCurrentPage}
+          onPageSizeChange={setPageSize}
+          pageSizeOptions={[4, 8, 12]}
+          itemLabel="activities"
+        />
       </div>
 
       {/* Add Modal */}

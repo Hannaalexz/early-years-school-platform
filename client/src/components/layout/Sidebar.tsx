@@ -14,6 +14,7 @@ import {
   ChevronRight,
   ShieldCheck,
   Calendar,
+  DoorOpen,
   LogOut,
   Smartphone,
   X
@@ -68,6 +69,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
       label: 'My Classroom',
       path: '/attendance',
       icon: <Calendar size={16} />,
+    },
+    {
+      label: 'Classrooms',
+      path: '/classrooms',
+      icon: <DoorOpen size={16} />,
     },
     {
       label: 'Activities',

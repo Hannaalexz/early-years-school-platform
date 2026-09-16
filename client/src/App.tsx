@@ -20,6 +20,7 @@ import { MonthlyProgressPage } from './pages/development/MonthlyProgressPage.js'
 import { ObservationsPage } from './pages/development/ObservationsPage.js';
 import { ActivitiesPage } from './pages/activities/ActivitiesPage.js';
 import { IncidentsPage } from './pages/health/IncidentsPage.js';
+import { ClassroomsPage } from './pages/classrooms/ClassroomsPage.js';
 import { ModulePlaceholder } from './pages/placeholder/ModulePlaceholder.js';
 
 export const App: React.FC = () => {
@@ -183,13 +184,20 @@ export const App: React.FC = () => {
       return <IncidentsPage />;
     }
 
+    // Classrooms Management & Early Years Environments
+    if (
+      currentPath.startsWith('/classrooms') ||
+      currentPath === '/children/classrooms' ||
+      currentPath.startsWith('/settings/classrooms')
+    ) {
+      return <ClassroomsPage onNavigate={setCurrentPath} onSelectChild={handleOpenChildProfile} />;
+    }
+
     // Settings routes
     if (
       currentPath.startsWith('/settings/school') ||
       currentPath.startsWith('/settings/campuses') ||
-      currentPath.startsWith('/settings/programs') ||
-      currentPath.startsWith('/settings/classrooms') ||
-      currentPath === '/children/classrooms'
+      currentPath.startsWith('/settings/programs')
     ) {
       return <SchoolSettingsPage />;
     }

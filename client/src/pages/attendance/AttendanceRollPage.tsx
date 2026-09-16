@@ -17,6 +17,7 @@ import {
   X
 } from 'lucide-react';
 import { api } from '../../services/api.js';
+import { Pagination } from '../../components/common/Pagination.js';
 
 interface AttendanceEntry {
   childId: string;
@@ -50,6 +51,8 @@ export const AttendanceRollPage: React.FC = () => {
   const [selectedClassroom, setSelectedClassroom] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
   // Edit Drop-off / Pickup Modal
   const [editingChildId, setEditingChildId] = useState<string | null>(null);
@@ -239,6 +242,37 @@ export const AttendanceRollPage: React.FC = () => {
         </div>
       </div>
 
+      {/* Classroom Filter Pills */}
+      <div className="flex flex-wrap items-center gap-1.5 p-1.5 rounded-2xl bg-white border border-ivory-300 shadow-2xs">
+        <span className="text-xs font-bold text-ink-500 font-['Quicksand'] px-2">Classroom:</span>
+        {[
+          { id: 'all', label: 'All Rooms', icon: '🏫' },
+          { id: 'Sunshine Classroom', label: 'Sunshine (KG1)', icon: '☀️' },
+          { id: 'Rainbow Classroom', label: 'Rainbow (Nursery)', icon: '🌈' },
+          { id: 'Butterfly Room', label: 'Butterfly (Toddlers)', icon: '🦋' },
+          { id: 'Little Explorers', label: 'Little Explorers (KG2)', icon: '🔍' },
+        ].map((room) => {
+          const isSelected = selectedClassroom === room.id;
+          return (
+            <button
+              key={room.id}
+              onClick={() => {
+                setSelectedClassroom(room.id);
+                setCurrentPage(1);
+              }}
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 font-['Quicksand'] ${
+                isSelected
+                  ? 'bg-gradient-to-r from-[#20BDB2] to-[#38D3C7] text-white shadow-xs'
+                  : 'bg-ivory-50 text-ink-700 hover:bg-[#F0FBF9] hover:text-[#0B4E49] border border-ivory-200'
+              }`}
+            >
+              <span>{room.icon}</span>
+              <span>{room.label}</span>
+            </button>
+          );
+        })}
+      </div>
+
       {/* Mode Switcher Tabs */}
       <div className="flex items-center justify-between bg-white p-2 rounded-3xl border border-ivory-300 shadow-xs">
         <div className="flex items-center gap-2">
@@ -307,7 +341,9 @@ export const AttendanceRollPage: React.FC = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-ivory-200">
-              {filteredChildren.map((c) => {
+              {filteredChildren
+                .slice((currentPage - 1) * pageSize, currentPage * pageSize)
+                .map((c) => {
                 const rec = records[c.id] || {
                   status: 'present',
                   arrivalTime: '08:45 AM',
@@ -456,6 +492,18 @@ export const AttendanceRollPage: React.FC = () => {
               })}
             </tbody>
           </table>
+        </div>
+
+        <div className="px-5 py-2.5 border-t border-ivory-200 bg-ivory-50/50">
+          <Pagination
+            currentPage={currentPage}
+            totalItems={filteredChildren.length}
+            pageSize={pageSize}
+            onPageChange={setCurrentPage}
+            onPageSizeChange={setPageSize}
+            pageSizeOptions={[10, 20, 30]}
+            itemLabel="children"
+          />
         </div>
       </div>
 
