@@ -356,7 +356,7 @@ export const ChildProfilePage: React.FC<ChildProfilePageProps> = ({
                     <th className="p-2.5">Date</th>
                     <th className="p-2.5">Status</th>
                     <th className="p-2.5">Arrival</th>
-                    <th className="p-2.5">Dropped Off By</th>
+                    <th className="p-2.5">Morning Note</th>
                     <th className="p-2.5">Departure</th>
                     <th className="p-2.5">Picked Up By</th>
                   </tr>
@@ -366,7 +366,7 @@ export const ChildProfilePage: React.FC<ChildProfilePageProps> = ({
                     <td className="p-2.5 font-bold">Sep 16, 2026</td>
                     <td className="p-2.5 text-emerald-700 font-bold">Present</td>
                     <td className="p-2.5">08:45 AM</td>
-                    <td className="p-2.5">Sarah Johnson (Mother)</td>
+                    <td className="p-2.5 text-ink-700">Arrived cheerful 🎈</td>
                     <td className="p-2.5">In class</td>
                     <td className="p-2.5 text-ink-400">—</td>
                   </tr>
@@ -374,7 +374,7 @@ export const ChildProfilePage: React.FC<ChildProfilePageProps> = ({
                     <td className="p-2.5 font-bold">Sep 15, 2026</td>
                     <td className="p-2.5 text-emerald-700 font-bold">Present</td>
                     <td className="p-2.5">08:50 AM</td>
-                    <td className="p-2.5">David Johnson (Father)</td>
+                    <td className="p-2.5 text-ink-700">Brought extra jacket</td>
                     <td className="p-2.5">03:30 PM</td>
                     <td className="p-2.5 font-bold">Sarah Johnson (✓ Authorized)</td>
                   </tr>
@@ -382,7 +382,7 @@ export const ChildProfilePage: React.FC<ChildProfilePageProps> = ({
                     <td className="p-2.5 font-bold">Sep 14, 2026</td>
                     <td className="p-2.5 text-emerald-700 font-bold">Present</td>
                     <td className="p-2.5">08:40 AM</td>
-                    <td className="p-2.5">Sarah Johnson (Mother)</td>
+                    <td className="p-2.5 text-ink-700">Allergy medicine noted</td>
                     <td className="p-2.5">03:35 PM</td>
                     <td className="p-2.5 font-bold">Eleanor Johnson (✓ Grandmother)</td>
                   </tr>
@@ -390,7 +390,7 @@ export const ChildProfilePage: React.FC<ChildProfilePageProps> = ({
                     <td className="p-2.5 font-bold">Sep 11, 2026</td>
                     <td className="p-2.5 text-dustyrose-700 font-bold">Absent</td>
                     <td className="p-2.5">--:--</td>
-                    <td className="p-2.5 text-ink-400">Resting at home</td>
+                    <td className="p-2.5 text-ink-400">Resting at home (mild fever)</td>
                     <td className="p-2.5">--:--</td>
                     <td className="p-2.5 text-ink-400">—</td>
                   </tr>

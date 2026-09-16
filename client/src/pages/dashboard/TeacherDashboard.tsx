@@ -26,10 +26,10 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ onNavigate }
 
   // Classroom quick list
   const sampleChildren = [
-    { name: 'Emma Johnson', age: '4y 3m', status: 'Present', arrival: '08:45 AM', droppedOffBy: 'Sarah Johnson (Mother)', hasAllergy: true },
-    { name: 'Lucas Miller', age: '4y 1m', status: 'Present', arrival: '08:50 AM', droppedOffBy: 'David Miller (Father)', hasAllergy: false },
-    { name: 'Sara Bekele', age: '3y 11m', status: 'Late', arrival: '09:20 AM', droppedOffBy: 'Hanna Bekele (Mother)', hasAllergy: false },
-    { name: 'Daniel Solomon', age: '4y 4m', status: 'Absent', arrival: '--:--', droppedOffBy: 'Resting at home', hasAllergy: false },
+    { name: 'Emma Johnson', age: '4y 3m', status: 'Present', arrival: '08:45 AM', morningNote: 'Arrived cheerful 🎈', hasAllergy: true },
+    { name: 'Lucas Miller', age: '4y 1m', status: 'Present', arrival: '08:50 AM', morningNote: 'Brought extra shoes', hasAllergy: false },
+    { name: 'Sara Bekele', age: '3y 11m', status: 'Late', arrival: '09:20 AM', morningNote: 'Heavy rain traffic 🌧️', hasAllergy: false },
+    { name: 'Daniel Solomon', age: '4y 4m', status: 'Absent', arrival: '--:--', morningNote: 'Resting at home 🏡', hasAllergy: false },
   ];
 
   return (
@@ -133,7 +133,7 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ onNavigate }
                     <th className="pb-2.5">Child</th>
                     <th className="pb-2.5">Status</th>
                     <th className="pb-2.5">Arrival</th>
-                    <th className="pb-2.5">Handed Over By</th>
+                    <th className="pb-2.5">Morning Note</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#F5F0E8] font-['Outfit']">
@@ -164,7 +164,7 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ onNavigate }
                         </span>
                       </td>
                       <td className="py-2.5 text-ink-600 font-mono text-[11px]">{c.arrival}</td>
-                      <td className="py-2.5 text-ink-700 font-medium text-[11px]">{c.droppedOffBy}</td>
+                      <td className="py-2.5 text-ink-700 font-medium text-[11px]">{c.morningNote}</td>
                     </tr>
                   ))}
                 </tbody>

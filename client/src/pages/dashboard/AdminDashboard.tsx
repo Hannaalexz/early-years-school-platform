@@ -56,7 +56,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) =>
     late: 1,
     rate: '92.8%',
     arrivedOnTime: 25,
-    droppedOffRecorded: 26,
     pickupDeparturesRecorded: 0,
   };
 
