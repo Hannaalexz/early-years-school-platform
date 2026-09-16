@@ -89,7 +89,9 @@ export default {
         },
       },
       fontFamily: {
-        sans: ['Plus Jakarta Sans', 'Inter', 'system-ui', '-apple-system', 'sans-serif'],
+        sans: ['Outfit', 'Quicksand', 'Nunito', 'system-ui', '-apple-system', 'sans-serif'],
+        display: ['Quicksand', 'Outfit', 'sans-serif'],
+        friendly: ['Quicksand', 'sans-serif'],
       },
       boxShadow: {
         subtle: '0 1px 3px rgba(28, 40, 38, 0.04), 0 1px 2px rgba(28, 40, 38, 0.02)',

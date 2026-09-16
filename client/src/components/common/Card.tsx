@@ -22,7 +22,7 @@ export const Card: React.FC<CardProps> = ({
     <div
       className={twMerge(
         clsx(
-          'bg-white rounded-2xl border border-ivory-300 shadow-subtle overflow-hidden',
+          'bg-white rounded-3xl border border-[#EFE9DF] shadow-xs overflow-hidden transition-all',
           className
         )
       )}
@@ -31,18 +31,26 @@ export const Card: React.FC<CardProps> = ({
       {(title || action) && (
         <div
           className={clsx(
-            'px-6 py-4 flex items-center justify-between',
-            headerBorder && 'border-b border-ivory-200'
+            'px-5 py-3.5 flex items-center justify-between',
+            headerBorder && 'border-b border-[#F0ECE4]'
           )}
         >
           <div>
-            {title && <h3 className="font-bold text-ink-800 text-base">{title}</h3>}
-            {subtitle && <p className="text-xs text-ink-500 mt-0.5">{subtitle}</p>}
+            {title && (
+              <h3 className="font-bold text-[#3D3530] text-sm font-['Quicksand']">
+                {title}
+              </h3>
+            )}
+            {subtitle && (
+              <p className="text-[11px] text-ink-500 mt-0.5 font-['Outfit']">
+                {subtitle}
+              </p>
+            )}
           </div>
           {action && <div>{action}</div>}
         </div>
       )}
-      <div className="p-6">{children}</div>
+      <div className="p-5">{children}</div>
     </div>
   );
 };

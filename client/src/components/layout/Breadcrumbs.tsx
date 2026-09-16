@@ -7,10 +7,12 @@ interface BreadcrumbsProps {
 }
 
 export const Breadcrumbs: React.FC<BreadcrumbsProps> = ({ currentPath, onNavigate }) => {
+  if (currentPath === '/dashboard' || currentPath === '/') return null;
+
   const parts = currentPath.split('/').filter(Boolean);
 
   return (
-    <nav className="flex items-center gap-1.5 text-xs text-ink-500 py-3 px-4 sm:px-6">
+    <nav className="flex items-center gap-1.5 text-xs text-ink-500 py-2.5 px-4 sm:px-6">
       <button
         onClick={() => onNavigate('/dashboard')}
         className="hover:text-forest-800 flex items-center gap-1 transition-colors"

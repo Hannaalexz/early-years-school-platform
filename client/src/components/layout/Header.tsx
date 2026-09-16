@@ -31,28 +31,28 @@ export const Header: React.FC<HeaderProps> = ({ onMenuToggle, onNavigate }) => {
   ];
 
   return (
-    <header className="h-16 bg-white border-b border-ivory-300 px-4 sm:px-6 flex items-center justify-between sticky top-0 z-30 shadow-xs">
+    <header className="h-16 bg-white border-b border-[#EFE9DF] px-4 sm:px-6 flex items-center justify-between sticky top-0 z-30 shadow-xs">
       <div className="flex items-center gap-3">
         <button
           onClick={onMenuToggle}
-          className="p-2 rounded-xl text-ink-600 hover:bg-ivory-200 lg:hidden focus:outline-none"
+          className="p-2 rounded-2xl text-ink-600 hover:bg-[#F0FBF9] lg:hidden focus:outline-none"
         >
           <Menu size={20} />
         </button>
 
         {/* School & Campus Badge */}
-        <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-primary-100 border border-primary-200 text-xs">
-          <span className="w-2 h-2 rounded-full bg-primary-500 animate-pulse" />
-          <span className="font-bold text-primary-900">{school?.name || 'Bubbles Early Years School'}</span>
-          <span className="text-ink-400">/</span>
-          <span className="text-primary-800 font-semibold">Bole Main Campus</span>
+        <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-2xl bg-[#E0F7F4] border border-[#C3EFEB] text-xs">
+          <span className="w-2 h-2 rounded-full bg-[#21B8AF] animate-pulse" />
+          <span className="font-bold text-[#0B4E49] font-['Quicksand']">{school?.name || 'Bubbles Early Years School'}</span>
+          <span className="text-[#99E5DE]">/</span>
+          <span className="text-[#168F89] font-medium font-['Outfit']">Bole Main Campus</span>
         </div>
 
         {/* Current Academic Year */}
         {currentAcademicYear && (
-          <div className="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-ivory-100 text-ink-600 text-xs border border-ivory-300">
-            <Calendar size={13} className="text-primary-700" />
-            <span className="font-medium">{currentAcademicYear.name}</span>
+          <div className="hidden md:flex items-center gap-1.5 px-3 py-1 rounded-2xl bg-[#FAF8F5] text-ink-600 text-xs border border-[#EFE9DF]">
+            <Calendar size={13} className="text-[#21B8AF]" />
+            <span className="font-semibold font-['Outfit']">{currentAcademicYear.name}</span>
           </div>
         )}
       </div>
@@ -63,7 +63,7 @@ export const Header: React.FC<HeaderProps> = ({ onMenuToggle, onNavigate }) => {
         {onNavigate && (
           <button
             onClick={() => onNavigate('/website')}
-            className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-primary-100 hover:bg-primary-200 text-primary-900 text-xs font-bold border border-primary-200 transition-colors shadow-xs"
+            className="hidden sm:flex items-center gap-1.5 px-3.5 py-1.5 rounded-2xl bg-[#E0F7F4] hover:bg-[#C3EFEB] text-[#0B4E49] text-xs font-bold border border-[#C3EFEB] transition-all shadow-xs font-['Quicksand']"
             title="View Public School Website"
           >
             <span>School Website</span>
@@ -71,16 +71,16 @@ export const Header: React.FC<HeaderProps> = ({ onMenuToggle, onNavigate }) => {
           </button>
         )}
 
-        {/* Quick 1-Click Role Switcher Pill (Crucial for Reviewer Testing) */}
+        {/* Quick 1-Click Role Switcher Pill */}
         <div className="relative">
           <button
             onClick={() => setShowRoleSwitcher(!showRoleSwitcher)}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-primary-700 to-primary-500 hover:from-primary-800 hover:to-primary-600 text-white text-xs font-bold shadow-sm shadow-primary-500/25 transition-all"
+            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-2xl bg-gradient-to-r from-[#20BDB2] to-[#38D3C7] hover:from-[#1BA49A] hover:to-[#29BCB1] text-white text-xs font-bold shadow-xs transition-all font-['Quicksand']"
           >
-            <Layers size={14} />
+            <Layers size={13} />
             <span className="hidden sm:inline">Role:</span>
             <span className="capitalize">{user?.role?.replace('_', ' ')}</span>
-            <ChevronDown size={14} />
+            <ChevronDown size={13} />
           </button>
 
           {showRoleSwitcher && (
