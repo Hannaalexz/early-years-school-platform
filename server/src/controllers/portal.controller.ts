@@ -90,7 +90,7 @@ export class PortalController {
   static async getChildSummary(req: PortalAuthRequest, res: Response): Promise<void> {
     try {
       const parentId = req.parentUser!.id;
-      const { childId } = req.params;
+      const childId = req.params.childId as string;
 
       const summary = await PortalService.getChildLiveFeed(parentId, childId);
 

@@ -61,7 +61,7 @@ export class SchoolsController {
 
   static async updateSchool(req: AuthRequest, res: Response): Promise<void> {
     try {
-      const schoolId = req.user?.school_id || req.params.id;
+      const schoolId = (req.user?.school_id || req.params.id) as string;
       const { name, tagline, address, city, phone, email, website, currency } = req.body;
 
       const updated = await pool.query(

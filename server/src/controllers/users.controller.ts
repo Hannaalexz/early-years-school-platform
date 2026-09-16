@@ -48,7 +48,7 @@ export class UsersController {
 
   static async getUser(req: AuthRequest, res: Response): Promise<void> {
     try {
-      const user = await UserService.getUserById(req.params.id);
+      const user = await UserService.getUserById(req.params.id as string);
       if (!user) {
         res.status(404).json({
           success: false,
@@ -119,7 +119,7 @@ export class UsersController {
   static async updateStatus(req: AuthRequest, res: Response): Promise<void> {
     try {
       const { status } = req.body;
-      const updated = await UserService.updateUserStatus(req.params.id, status as UserStatus, req.user?.id);
+      const updated = await UserService.updateUserStatus(req.params.id as string, status as UserStatus, req.user?.id);
 
       res.status(200).json({
         success: true,
@@ -137,7 +137,7 @@ export class UsersController {
 
   static async deleteUser(req: AuthRequest, res: Response): Promise<void> {
     try {
-      await UserService.softDeleteUser(req.params.id, req.user?.id);
+      await UserService.softDeleteUser(req.params.id as string, req.user?.id);
       res.status(200).json({
         success: true,
         message: 'User deactivated successfully',

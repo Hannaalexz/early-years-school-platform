@@ -3,22 +3,22 @@ import {
   Baby,
   UserCheck,
   UserX,
-  GraduationCap,
-  FileText,
-  AlertTriangle,
   Clock,
-  AlertCircle,
+  GraduationCap,
+  DoorOpen,
+  Calendar,
+  AlertTriangle,
+  ShieldCheck,
+  Bell,
+  Sparkles,
   Plus,
-  Shield,
-  Activity,
-  HeartHandshake
+  ArrowRight
 } from 'lucide-react';
 import { StatCard } from '../../components/common/StatCard.js';
 import { Card } from '../../components/common/Card.js';
 import { Badge } from '../../components/common/Badge.js';
 import { Button } from '../../components/common/Button.js';
 import { api } from '../../services/api.js';
-import { AuditLog } from '../../types/index.js';
 
 interface AdminDashboardProps {
   onNavigate: (path: string) => void;
@@ -26,142 +26,160 @@ interface AdminDashboardProps {
 
 export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
   const [stats, setStats] = useState<any>(null);
-  const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    Promise.all([api.getDashboardStats(), api.getAuditLogs()])
-      .then(([statsRes, logsRes]) => {
-        if (statsRes.success) setStats(statsRes.data);
-        if (logsRes.success) setAuditLogs(logsRes.data || []);
+    api.getDashboardStats()
+      .then((res) => {
+        if (res.success) setStats(res.data);
       })
       .finally(() => setLoading(false));
   }, []);
 
   const kpis = stats?.kpis || {
-    totalChildren: 18,
-    presentToday: 16,
+    totalChildren: 28,
+    presentToday: 26,
     absentToday: 2,
-    totalStaff: 5,
-    pendingApplications: 5,
-    attendanceRate: 88.9,
+    lateToday: 1,
+    totalTeachers: 6,
+    totalClassrooms: 4,
+    activeAllergies: 3,
+    recentIncidents: 0,
+  };
+
+  const attendance = stats?.todayAttendance || {
+    present: 26,
+    absent: 2,
+    late: 1,
+    rate: '92.8%',
+    arrivedOnTime: 25,
+    droppedOffRecorded: 26,
+    pickupDeparturesRecorded: 0,
   };
 
   const classrooms = stats?.classroomCapacities || [
-    { name: 'Sunshine Classroom (KG1)', enrolled: 6, capacity: 18, fill: 33.3 },
-    { name: 'Rainbow Classroom (Nursery)', enrolled: 4, capacity: 16, fill: 25 },
-    { name: 'Butterfly Room (Toddlers)', enrolled: 4, capacity: 12, fill: 33.3 },
-    { name: 'Little Explorers (KG2)', enrolled: 4, capacity: 20, fill: 20 },
+    { name: 'Sunshine Classroom (KG1)', enrolled: 18, capacity: 18, fill: 100 },
+    { name: 'Rainbow Classroom (Nursery)', enrolled: 14, capacity: 16, fill: 87.5 },
+    { name: 'Butterfly Room (Toddlers)', enrolled: 10, capacity: 12, fill: 83.3 },
+    { name: 'Little Explorers (KG2)', enrolled: 16, capacity: 20, fill: 80 },
+  ];
+
+  const upcomingEvents = stats?.upcomingEvents || [
+    { date: 'Sep 22, 2026', title: 'Autumn Leaf Sensory Exploration', time: '10:00 AM' },
+    { date: 'Sep 29, 2026', title: 'Parent-Teacher Monthly Growth Circle', time: '04:00 PM' },
+  ];
+
+  const announcements = stats?.recentAnnouncements || [
+    { title: 'Welcome to September Learning Term', date: 'Sep 15, 2026', author: 'School Admin' },
+    { title: 'Reminder: Update Authorized Pickup Lists', date: 'Sep 10, 2026', author: 'Front Desk' },
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 font-sans pb-12">
       {/* Welcome Banner */}
-      <div className="bg-gradient-to-r from-primary-800 via-primary-700 to-primary-500 rounded-3xl p-6 sm:p-8 text-white shadow-lg shadow-primary-500/20 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div className="bg-gradient-to-r from-[#1BA49A] via-[#20BDB2] to-[#38D3C7] rounded-3xl p-6 sm:p-8 text-white shadow-lg shadow-[#21B8AF]/20 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary-900/40 text-primary-100 text-xs font-bold mb-3 border border-primary-400/30">
-            <Shield size={13} />
-            <span>School Director Portal</span>
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 text-white text-xs font-bold mb-3 border border-white/30 backdrop-blur">
+            <ShieldCheck size={14} />
+            <span>School Administration</span>
           </div>
-          <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
+          <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight font-['Baloo_2']">
             Good morning, Martha 👋
           </h2>
-          <p className="text-primary-50 text-xs sm:text-sm mt-1 max-w-xl font-medium">
-            Bubbles Early Years School is in full session. 18 registered early-years children with active care monitoring across all 4 classrooms.
+          <p className="text-white/90 text-xs sm:text-sm mt-1 max-w-xl font-medium">
+            Bubbles Early Years School is in session. {kpis.totalChildren} enrolled children across {kpis.totalClassrooms} classrooms.
           </p>
         </div>
 
         <div className="flex flex-wrap items-center gap-2.5">
-          <Button
-            variant="terracotta"
-            size="sm"
-            icon={<Plus size={15} />}
-            onClick={() => onNavigate('/children/all')}
+          <button
+            onClick={() => onNavigate('/attendance')}
+            className="px-4 py-2 rounded-xl bg-white text-[#0B4E49] text-xs font-bold shadow-sm hover:bg-[#F0FBF9] transition"
           >
-            Register Child
-          </Button>
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => onNavigate('/children/all')}
+            Open Attendance Roll
+          </button>
+          <button
+            onClick={() => onNavigate('/development/monthly-progress')}
+            className="px-4 py-2 rounded-xl bg-[#0B4E49]/30 hover:bg-[#0B4E49]/50 text-white text-xs font-bold border border-white/30 transition"
           >
-            Children Directory
-          </Button>
+            Monthly Reports
+          </button>
         </div>
       </div>
 
-      {/* Primary KPI Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+      {/* Primary KPI Grid (Section 25: Total children, Present today, Absent today, Late today, Teachers, Classrooms) */}
+      <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
         <StatCard
           title="Total Children"
-          value="18"
-          subtitle="Enrolled (1–6 yrs)"
+          value={String(kpis.totalChildren)}
+          subtitle="Ages 1–6"
           icon={<Baby size={20} />}
           colorScheme="primary"
           onClick={() => onNavigate('/children/all')}
         />
         <StatCard
           title="Present Today"
-          value="16"
-          subtitle="89% on site"
+          value={String(kpis.presentToday)}
+          subtitle={`${attendance.rate} attendance`}
           icon={<UserCheck size={20} />}
           colorScheme="primary"
-          trend={{ value: '89%', isPositive: true }}
-          onClick={() => onNavigate('/children/attendance')}
+          trend={{ value: attendance.rate, isPositive: true }}
+          onClick={() => onNavigate('/attendance')}
         />
         <StatCard
-          title="Absent"
-          value="2"
-          subtitle="2 reported sick"
+          title="Absent Today"
+          value={String(kpis.absentToday)}
+          subtitle="Reported resting"
           icon={<UserX size={20} />}
           colorScheme="dustyrose"
-          onClick={() => onNavigate('/children/attendance')}
+          onClick={() => onNavigate('/attendance')}
+        />
+        <StatCard
+          title="Late Today"
+          value={String(kpis.lateToday)}
+          subtitle="Traffic delays"
+          icon={<Clock size={20} />}
+          colorScheme="amber"
+          onClick={() => onNavigate('/attendance')}
         />
         <StatCard
           title="Teachers & Staff"
-          value="5"
-          subtitle="All active"
+          value={String(kpis.totalTeachers)}
+          subtitle="Educators on duty"
           icon={<GraduationCap size={20} />}
           colorScheme="primary"
-          onClick={() => onNavigate('/staff/teachers')}
+          onClick={() => onNavigate('/staff')}
         />
         <StatCard
-          title="Care & Allergy"
-          value="7"
-          subtitle="Diet/Medical Flags"
-          icon={<AlertTriangle size={20} />}
-          colorScheme="amber"
-          onClick={() => onNavigate('/children/all')}
-        />
-        <StatCard
-          title="Admissions"
-          value="5"
-          subtitle="Tours / Enquiries"
-          icon={<FileText size={20} />}
-          colorScheme="terracotta"
-          onClick={() => onNavigate('/admissions/enquiries')}
+          title="Classrooms"
+          value={String(kpis.totalClassrooms)}
+          subtitle="All rooms active"
+          icon={<DoorOpen size={20} />}
+          colorScheme="primary"
+          onClick={() => onNavigate('/children/classrooms')}
         />
       </div>
 
-      {/* Middle Section: Classroom Capacities & Care Overview */}
+      {/* Middle Section: Classroom Capacities & Today's Attendance Breakdown */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Classrooms */}
         <Card
-          title="Classroom Enrollment & Rooms"
-          subtitle="Early childhood distribution"
+          title="Classroom Capacities & Distribution"
+          subtitle="Early childhood placement"
           action={
             <Button
               variant="ghost"
               size="sm"
               onClick={() => onNavigate('/children/all')}
             >
-              View Roster
+              View All Children
             </Button>
           }
           className="lg:col-span-2"
         >
-          <div className="space-y-4">
+          <div className="space-y-3.5">
             {classrooms.map((c: any) => (
-              <div key={c.name} className="p-3.5 rounded-xl bg-ivory-50 border border-ivory-200">
+              <div key={c.name} className="p-3.5 rounded-2xl bg-ivory-50 border border-ivory-200">
                 <div className="flex items-center justify-between text-xs mb-2">
                   <span className="font-bold text-ink-900">{c.name}</span>
                   <span className="font-semibold text-ink-600">
@@ -170,7 +188,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) =>
                 </div>
                 <div className="w-full h-2.5 bg-ivory-200 rounded-full overflow-hidden">
                   <div
-                    className="h-full rounded-full bg-gradient-to-r from-primary-600 to-primary-400 transition-all duration-500"
+                    className="h-full rounded-full bg-gradient-to-r from-[#20BDB2] to-[#38D3C7] transition-all duration-500"
                     style={{ width: `${Math.max(c.fill, 15)}%` }}
                   />
                 </div>
@@ -179,75 +197,117 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) =>
           </div>
         </Card>
 
-        {/* Today's Care Summary */}
+        {/* Today's Attendance Breakdown (Section 25) */}
         <Card
-          title="Today's Care Pulse"
-          subtitle="Daily operational wellness"
+          title="Today's Attendance Breakdown"
+          subtitle="Morning roll and pickup tracking"
           className="space-y-3"
         >
-          <div className="space-y-3">
-            <div className="flex items-center justify-between p-3 rounded-xl bg-primary-50 border border-primary-200 text-xs">
-              <div className="flex items-center gap-2">
-                <Clock size={16} className="text-primary-700" />
-                <span className="font-semibold text-primary-900">Check-in Status</span>
-              </div>
-              <Badge variant="success">15 on-time / 1 late</Badge>
+          <div className="space-y-2.5">
+            <div className="p-3.5 rounded-2xl bg-[#F0FBF9] border border-[#C3EFEB] flex items-center justify-between text-xs">
+              <span className="font-bold text-[#0B4E49]">Morning Drop-offs Logged</span>
+              <span className="font-extrabold text-[#0B4E49] text-sm">
+                {attendance.droppedOffRecorded} Children
+              </span>
             </div>
 
-            <div className="flex items-center justify-between p-3 rounded-xl bg-ivory-50 border border-ivory-200 text-xs">
-              <div className="flex items-center gap-2">
-                <Activity size={16} className="text-terracotta-500" />
-                <span className="font-medium text-ink-800">Nap Rest Time</span>
-              </div>
-              <Badge variant="warning">Toddlers Resting</Badge>
+            <div className="p-3.5 rounded-2xl bg-ivory-50 border border-ivory-200 flex items-center justify-between text-xs">
+              <span className="font-medium text-ink-800">On-Time Arrivals</span>
+              <span className="font-bold text-emerald-800">{attendance.arrivedOnTime}</span>
             </div>
 
-            <div className="flex items-center justify-between p-3 rounded-xl bg-ivory-50 border border-ivory-200 text-xs">
-              <div className="flex items-center gap-2">
-                <AlertCircle size={16} className="text-primary-700" />
-                <span className="font-medium text-ink-800">Incident Reports</span>
-              </div>
-              <Badge variant="success">0 incidents</Badge>
+            <div className="p-3.5 rounded-2xl bg-ivory-50 border border-ivory-200 flex items-center justify-between text-xs">
+              <span className="font-medium text-ink-800">Late Arrivals</span>
+              <span className="font-bold text-amber-800">{attendance.late}</span>
             </div>
 
-            <div className="p-3.5 rounded-xl bg-ivory-100 text-xs text-ink-600 space-y-1 border border-ivory-200">
-              <p className="font-bold text-ink-900">Nutrition & Diaper Log:</p>
-              <p>Morning oatmeal & fruit completed. Butterfly Room toddler diaper checks recorded on schedule.</p>
+            <div className="p-3.5 rounded-2xl bg-ivory-50 border border-ivory-200 flex items-center justify-between text-xs">
+              <span className="font-medium text-ink-800">Departures / Pickups Recorded</span>
+              <span className="font-bold text-ink-600">{attendance.pickupDeparturesRecorded}</span>
             </div>
+
+            <button
+              onClick={() => onNavigate('/attendance')}
+              className="w-full py-2 rounded-xl bg-ivory-100 hover:bg-ivory-200 text-[#0B4E49] text-xs font-bold transition text-center"
+            >
+              Manage Attendance Roll →
+            </button>
           </div>
         </Card>
       </div>
 
-      {/* Bottom Section: Audit Log */}
-      <Card
-        title="Audit Trail & Security Activity"
-        subtitle="Recent administrative events logged in PostgreSQL"
-        action={
-          <Badge variant="neutral">{auditLogs.length} logged actions</Badge>
-        }
-      >
-        <div className="divide-y divide-ivory-200">
-          {auditLogs.slice(0, 5).map((log) => (
-            <div key={log.id} className="py-3 flex items-center justify-between text-xs">
-              <div className="flex items-center gap-3">
-                <div className="w-7 h-7 rounded-lg bg-primary-100 text-primary-900 border border-primary-200 flex items-center justify-center font-bold text-[10px]">
-                  LOG
-                </div>
-                <div>
-                  <p className="font-bold text-ink-900">{log.action}</p>
-                  <p className="text-ink-500 text-[11px]">
-                    User: {log.first_name ? `${log.first_name} ${log.last_name}` : log.user_email || 'System'} ({log.role_id || 'system'})
-                  </p>
-                </div>
-              </div>
-
-              <span className="text-[11px] text-ink-400">
-                {new Date(log.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+      {/* Bottom Section: Recent Incidents, Upcoming Events, Announcements (Section 25) */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* Recent Incidents */}
+        <Card
+          title="Safety & Incidents"
+          subtitle="Campus first aid log"
+          action={
+            <button
+              onClick={() => onNavigate('/health/incidents')}
+              className="text-[11px] font-bold text-[#0B4E49] hover:underline"
+            >
+              View Log
+            </button>
+          }
+        >
+          <div className="space-y-2 text-xs">
+            <div className="p-3 rounded-2xl bg-[#F0FBF9] border border-[#C3EFEB] flex items-center gap-2">
+              <ShieldCheck size={16} className="text-[#21B8AF] shrink-0" />
+              <span className="text-[#0B4E49] font-medium">
+                Zero active medical incidents today. Playground supervised.
               </span>
             </div>
-          ))}
-        </div>
-      </Card>
+            <p className="text-[11px] text-ink-500 italic pt-1">
+              All staff certified in pediatric first aid and CPR.
+            </p>
+          </div>
+        </Card>
+
+        {/* Upcoming Events */}
+        <Card
+          title="Upcoming School Events"
+          subtitle="Campus calendar"
+        >
+          <div className="space-y-2 text-xs">
+            {upcomingEvents.map((evt: any, i: number) => (
+              <div key={i} className="p-3 rounded-2xl bg-ivory-50 border border-ivory-200 space-y-0.5">
+                <p className="font-bold text-ink-900">{evt.title}</p>
+                <div className="flex items-center justify-between text-[11px] text-ink-500">
+                  <span>{evt.date}</span>
+                  <span className="font-mono">{evt.time}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
+
+        {/* Recent Announcements */}
+        <Card
+          title="Recent Announcements"
+          subtitle="Parent and school broadcasts"
+          action={
+            <button
+              onClick={() => onNavigate('/communication/announcements')}
+              className="text-[11px] font-bold text-[#0B4E49] hover:underline"
+            >
+              Manage
+            </button>
+          }
+        >
+          <div className="space-y-2 text-xs">
+            {announcements.map((ann: any, i: number) => (
+              <div key={i} className="p-3 rounded-2xl bg-ivory-50 border border-ivory-200 space-y-0.5">
+                <p className="font-bold text-ink-900">{ann.title}</p>
+                <div className="flex items-center justify-between text-[11px] text-ink-500">
+                  <span>{ann.date}</span>
+                  <span>{ann.author}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
+      </div>
     </div>
   );
 };

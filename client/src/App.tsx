@@ -16,7 +16,10 @@ import { ParentsDirectoryPage } from './pages/parents/ParentsDirectoryPage.js';
 import { PortalAccessPage } from './pages/parents/PortalAccessPage.js';
 import { ParentPortalView } from './pages/portal/ParentPortalView.js';
 import { AttendanceRollPage } from './pages/attendance/AttendanceRollPage.js';
-import { DailyCareLoggerPage } from './pages/care/DailyCareLoggerPage.js';
+import { MonthlyProgressPage } from './pages/development/MonthlyProgressPage.js';
+import { ObservationsPage } from './pages/development/ObservationsPage.js';
+import { ActivitiesPage } from './pages/activities/ActivitiesPage.js';
+import { IncidentsPage } from './pages/health/IncidentsPage.js';
 import { ModulePlaceholder } from './pages/placeholder/ModulePlaceholder.js';
 
 export const App: React.FC = () => {
@@ -157,14 +160,27 @@ export const App: React.FC = () => {
       return <ParentsDirectoryPage onSelectChild={handleOpenChildProfile} />;
     }
 
-    // Attendance Roll Call (Section 37 & 38)
-    if (currentPath.startsWith('/attendance') || currentPath.startsWith('/children/attendance') || currentPath.startsWith('/children/pickup')) {
+    // Attendance Roll Call & Pickup (Section 37 & 38)
+    if (currentPath.startsWith('/attendance') || currentPath.startsWith('/children/attendance') || currentPath.startsWith('/children/pickup') || currentPath.startsWith('/daily-care')) {
       return <AttendanceRollPage />;
     }
 
-    // Daily Care & Wellbeing Logger (Section 37 & 38)
-    if (currentPath.startsWith('/daily-care')) {
-      return <DailyCareLoggerPage />;
+    // Early Years Development & Monthly Progress (Ages 1–6)
+    if (currentPath.startsWith('/development/monthly-progress')) {
+      return <MonthlyProgressPage />;
+    }
+    if (currentPath.startsWith('/development')) {
+      return <ObservationsPage />;
+    }
+
+    // Play-Based Classroom Activities
+    if (currentPath.startsWith('/activities')) {
+      return <ActivitiesPage />;
+    }
+
+    // Health & Safety (Allergies & Incidents)
+    if (currentPath.startsWith('/health')) {
+      return <IncidentsPage />;
     }
 
     // Settings routes
@@ -182,44 +198,6 @@ export const App: React.FC = () => {
     }
     if (currentPath.startsWith('/settings/roles') || currentPath.startsWith('/settings/permissions')) {
       return <RolesPage />;
-    }
-
-    // Phase 5: Development
-    if (currentPath.startsWith('/development')) {
-      return (
-        <ModulePlaceholder
-          title="Early Years Developmental Progress & Portfolios"
-          phaseNumber={5}
-          phaseName="Development Management"
-          description="Non-traditional developmental milestones across 6 core early years domains (Emerging, Developing, Achieved) and digital growth timelines."
-          features={[
-            'Cognitive, Language, Social-Emotional, Physical, Creative, and Early Literacy areas',
-            'Status tracking: Emerging ○, Developing ◐, Achieved ✓ with teacher observations',
-            'Photo & media evidence attachments linked to specific skills',
-            'Digital Child Portfolio: Visual growth timeline exportable for annual parent review',
-          ]}
-          onNavigate={setCurrentPath}
-        />
-      );
-    }
-
-    // Phase 6: Activities & Lesson Plans
-    if (currentPath.startsWith('/activities')) {
-      return (
-        <ModulePlaceholder
-          title="Curriculum & Activity Planning"
-          phaseNumber={6}
-          phaseName="Activities & Lesson Planning"
-          description="Plan sensory, creative, and motor activities with developmental objective mappings, instructions, and weekly classroom schedules."
-          features={[
-            'Weekly themed lesson plans (Colors, Shapes, Animals, Counting)',
-            'Learning objectives tied directly to developmental milestones',
-            'Material lists, preparation instructions, and time allocations',
-            'Activity photo journals shared to parent feeds',
-          ]}
-          onNavigate={setCurrentPath}
-        />
-      );
     }
 
     // Phase 7: Communication & Gallery

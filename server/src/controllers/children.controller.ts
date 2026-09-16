@@ -70,7 +70,7 @@ export class ChildrenController {
   static async getChild(req: AuthRequest, res: Response): Promise<void> {
     try {
       const user = req.user!;
-      const childId = req.params.id;
+      const childId = req.params.id as string;
 
       // Check parent isolation (#56 Security: Users cannot access unauthorized children)
       if (user.role === 'parent') {
@@ -128,7 +128,7 @@ export class ChildrenController {
 
   static async updateChild(req: AuthRequest, res: Response): Promise<void> {
     try {
-      const childId = req.params.id;
+      const childId = req.params.id as string;
       const updated = await ChildrenService.updateChild(childId, req.body, req.user?.id);
 
       res.status(200).json({
@@ -143,7 +143,7 @@ export class ChildrenController {
 
   static async addAuthorizedPickup(req: AuthRequest, res: Response): Promise<void> {
     try {
-      const childId = req.params.id;
+      const childId = req.params.id as string;
       const pickup = await ChildrenService.addAuthorizedPickup(childId, req.body, req.user?.id);
 
       res.status(201).json({
@@ -158,7 +158,7 @@ export class ChildrenController {
 
   static async updatePickupStatus(req: AuthRequest, res: Response): Promise<void> {
     try {
-      const { pickupId } = req.params;
+      const pickupId = req.params.pickupId as string;
       const { status } = req.body;
 
       const updated = await ChildrenService.updatePickupStatus(pickupId, status, req.user?.id);

@@ -4,7 +4,7 @@ import {
   Users,
   Baby,
   Sparkles,
-  HeartHandshake,
+  Award,
   Palette,
   Heart,
   Briefcase,
@@ -14,7 +14,6 @@ import {
   ChevronDown,
   ChevronRight,
   ShieldCheck,
-  Building2,
   Calendar,
   LogOut,
   X
@@ -47,8 +46,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const { user, logout } = useAuth();
   const { school } = useSchool();
   const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({
-    Children: true,
-    'Daily Care': false,
+    Children: false,
+    Development: false,
+    Parents: false,
     Settings: false,
   });
 
@@ -56,8 +56,49 @@ export const Sidebar: React.FC<SidebarProps> = ({
     setExpandedGroups((prev) => ({ ...prev, [label]: !prev[label] }));
   };
 
-  // Simplified Early Years Navigation (Section 37) - Transport & Finance omitted
-  const navigationItems: NavItem[] = [
+  const isTeacher = user?.role === 'teacher';
+
+  // Navigation Items according to Section 33 (Admin) and Section 34 (Teacher)
+  const teacherNavigation: NavItem[] = [
+    {
+      label: 'Dashboard',
+      path: '/dashboard',
+      icon: <LayoutDashboard size={18} />,
+    },
+    {
+      label: 'My Classroom',
+      path: '/attendance',
+      icon: <Calendar size={18} />,
+    },
+    {
+      label: 'Activities',
+      path: '/activities',
+      icon: <Palette size={18} />,
+    },
+    {
+      label: 'Development Observations',
+      path: '/development/observations',
+      icon: <Sparkles size={18} />,
+    },
+    {
+      label: 'Monthly Progress',
+      path: '/development/monthly-progress',
+      icon: <Award size={18} />,
+      badge: 'Report',
+    },
+    {
+      label: 'Health & Safety',
+      path: '/health/incidents',
+      icon: <ShieldCheck size={18} />,
+    },
+    {
+      label: 'Announcements',
+      path: '/communication/announcements',
+      icon: <MessageSquare size={18} />,
+    },
+  ];
+
+  const adminNavigation: NavItem[] = [
     {
       label: 'Dashboard',
       path: '/dashboard',
@@ -67,7 +108,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
       label: 'Children',
       path: '/children/all',
       icon: <Baby size={18} />,
-      roles: ['super_admin', 'school_admin', 'teacher', 'admissions'],
       children: [
         { label: 'All Children', path: '/children/all' },
         { label: 'Classrooms', path: '/children/classrooms' },
@@ -77,83 +117,44 @@ export const Sidebar: React.FC<SidebarProps> = ({
       label: 'Attendance',
       path: '/attendance',
       icon: <Calendar size={18} />,
-      roles: ['super_admin', 'school_admin', 'teacher'],
-      children: [
-        { label: 'Attendance Roll', path: '/attendance' },
-        { label: 'Attendance History', path: '/attendance/history' },
-      ],
     },
     {
       label: 'Development',
-      path: '/development',
+      path: '/development/monthly-progress',
       icon: <Sparkles size={18} />,
-      roles: ['super_admin', 'school_admin', 'teacher'],
       children: [
+        { label: 'Monthly Progress Reports', path: '/development/monthly-progress' },
         { label: 'Observations', path: '/development/observations' },
-        { label: 'Assessments', path: '/development/assessments' },
-        { label: 'Milestones', path: '/development/milestones' },
-        { label: 'Child Portfolios', path: '/development/portfolios' },
-      ],
-    },
-    {
-      label: 'Daily Care',
-      path: '/daily-care',
-      icon: <HeartHandshake size={18} />,
-      roles: ['super_admin', 'school_admin', 'teacher'],
-      children: [
-        { label: 'Daily Care Logger', path: '/daily-care/logger' },
-        { label: 'Meals', path: '/daily-care/meals' },
-        { label: 'Nap Tracking', path: '/daily-care/naps' },
-        { label: 'Mood & Wellbeing', path: '/daily-care/mood' },
-        { label: 'Daily Reports', path: '/daily-care/reports' },
       ],
     },
     {
       label: 'Activities',
       path: '/activities',
       icon: <Palette size={18} />,
-      roles: ['super_admin', 'school_admin', 'teacher'],
-      children: [
-        { label: 'Activities', path: '/activities/list' },
-        { label: 'Lesson Plans', path: '/activities/lesson-plans' },
-        { label: 'Events', path: '/activities/events' },
-      ],
     },
     {
       label: 'Parents',
       path: '/parents/directory',
       icon: <Heart size={18} />,
-      roles: ['super_admin', 'school_admin', 'teacher'],
       children: [
         { label: 'Parents Directory', path: '/parents/directory' },
         { label: 'Portal Access Codes', path: '/parents/portal-access' },
       ],
     },
     {
-      label: 'Staff',
+      label: 'Staff (Teachers)',
       path: '/staff',
       icon: <Briefcase size={18} />,
-      roles: ['super_admin', 'school_admin'],
-      children: [
-        { label: 'Teachers', path: '/staff/teachers' },
-        { label: 'Class Assignments', path: '/staff/assignments' },
-      ],
     },
     {
       label: 'Health & Safety',
-      path: '/health',
+      path: '/health/incidents',
       icon: <ShieldCheck size={18} />,
-      roles: ['super_admin', 'school_admin', 'teacher'],
-      children: [
-        { label: 'Health & Allergies', path: '/health/records' },
-        { label: 'Incidents & First Aid', path: '/health/incidents' },
-      ],
     },
     {
       label: 'Communication',
-      path: '/communication',
+      path: '/communication/announcements',
       icon: <MessageSquare size={18} />,
-      roles: ['super_admin', 'school_admin', 'teacher'],
       children: [
         { label: 'Announcements', path: '/communication/announcements' },
         { label: 'Moments Gallery', path: '/communication/gallery' },
@@ -163,13 +164,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
       label: 'Reports',
       path: '/reports',
       icon: <BarChart3 size={18} />,
-      roles: ['super_admin', 'school_admin'],
     },
     {
       label: 'Settings',
-      path: '/settings',
+      path: '/settings/school',
       icon: <Settings size={18} />,
-      roles: ['super_admin', 'school_admin'],
       children: [
         { label: 'School Profile', path: '/settings/school' },
         { label: 'Programs', path: '/settings/programs' },
@@ -179,13 +178,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     },
   ];
 
-  // Filter items by user role
-  const visibleItems = navigationItems.filter((item) => {
-    if (!item.roles) return true;
-    if (!user) return false;
-    if (user.role === 'super_admin') return true;
-    return item.roles.includes(user.role);
-  });
+  const visibleItems = isTeacher ? teacherNavigation : adminNavigation;
 
   return (
     <>
@@ -215,7 +208,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <h1 className="font-extrabold text-sm text-[#4B4039] leading-tight font-['Baloo_2']">
                 {school?.name || 'Bubbles Early Years'}
               </h1>
-              <p className="text-[11px] font-bold text-[#21B8AF]">Early Years Platform (1–6)</p>
+              <p className="text-[11px] font-bold text-[#21B8AF]">
+                {isTeacher ? 'Teacher Workspace' : 'School Administration'}
+              </p>
             </div>
           </div>
           <button
@@ -259,11 +254,18 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     <span>{item.label}</span>
                   </div>
 
-                  {hasChildren && (
-                    <span className={isCurrentActive ? 'text-white/90' : 'text-ink-400'}>
-                      {isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-                    </span>
-                  )}
+                  <div className="flex items-center gap-1.5">
+                    {item.badge && (
+                      <span className="px-1.5 py-0.5 text-[9px] font-bold bg-amber-100 text-amber-800 rounded-md">
+                        {item.badge}
+                      </span>
+                    )}
+                    {hasChildren && (
+                      <span className={isCurrentActive ? 'text-white/90' : 'text-ink-400'}>
+                        {isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+                      </span>
+                    )}
+                  </div>
                 </button>
 
                 {/* Submenu */}
@@ -328,7 +330,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <div className="p-3 border-t border-ivory-200 bg-ivory-50">
           <div className="flex items-center justify-between p-2 rounded-xl bg-white border border-ivory-300">
             <div className="flex items-center gap-2.5 truncate">
-              <div className="w-8 h-8 rounded-full bg-sage-200 text-forest-800 font-bold text-xs flex items-center justify-center shrink-0">
+              <div className="w-8 h-8 rounded-full bg-[#E0F7F4] text-[#0B4E49] font-bold text-xs flex items-center justify-center shrink-0">
                 {user?.first_name?.[0]}
                 {user?.last_name?.[0]}
               </div>

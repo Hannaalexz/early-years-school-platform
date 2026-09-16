@@ -291,3 +291,91 @@ CREATE TRIGGER trg_parents_updated_at BEFORE UPDATE ON parents FOR EACH ROW EXEC
 
 DROP TRIGGER IF EXISTS trg_authorized_pickups_updated_at ON authorized_pickups;
 CREATE TRIGGER trg_authorized_pickups_updated_at BEFORE UPDATE ON authorized_pickups FOR EACH ROW EXECUTE FUNCTION update_timestamp();
+
+-- ============================================================================
+-- 8. SIMPLIFIED EARLY YEARS TABLES
+-- ============================================================================
+
+-- Attendance & Arrival / Drop-off & Pickup
+CREATE TABLE IF NOT EXISTS attendance_records (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    child_id UUID NOT NULL REFERENCES children(id) ON DELETE CASCADE,
+    date DATE NOT NULL DEFAULT CURRENT_DATE,
+    status VARCHAR(20) NOT NULL DEFAULT 'present', -- 'present', 'absent', 'late', 'excused'
+    arrival_time VARCHAR(20),
+    dropped_off_by VARCHAR(150),
+    dropped_off_relationship VARCHAR(100),
+    departure_time VARCHAR(20),
+    picked_up_by VARCHAR(150),
+    picked_up_relationship VARCHAR(100),
+    pickup_authorized BOOLEAN DEFAULT true,
+    staff_id UUID REFERENCES users(id) ON DELETE SET NULL,
+    notes TEXT,
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(child_id, date)
+);
+
+-- Meaningful Developmental Observations
+CREATE TABLE IF NOT EXISTS development_observations (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    child_id UUID NOT NULL REFERENCES children(id) ON DELETE CASCADE,
+    area VARCHAR(100) NOT NULL, -- 'Cognitive', 'Language & Communication', 'Social & Emotional', 'Physical', 'Creative', 'Early Literacy'
+    skill VARCHAR(150),
+    observation TEXT NOT NULL,
+    status VARCHAR(30) DEFAULT 'developing', -- 'emerging', 'developing', 'achieved'
+    date DATE NOT NULL DEFAULT CURRENT_DATE,
+    teacher_id UUID REFERENCES users(id) ON DELETE SET NULL,
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Monthly Progress Reports (Parent-Facing)
+CREATE TABLE IF NOT EXISTS monthly_reports (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    child_id UUID NOT NULL REFERENCES children(id) ON DELETE CASCADE,
+    month VARCHAR(20) NOT NULL, -- 'September'
+    year INT NOT NULL, -- 2026
+    attendance_summary JSONB DEFAULT '{"present": 20, "absent": 2, "late": 1}'::jsonb,
+    development_progress JSONB DEFAULT '{"cognitive": "Developing", "language": "Developing", "social_emotional": "Achieved", "physical": "Developing", "creative": "Achieved", "early_literacy": "Developing"}'::jsonb,
+    teacher_summary TEXT,
+    highlights TEXT[] DEFAULT '{}',
+    status VARCHAR(30) DEFAULT 'published', -- 'draft', 'published'
+    published_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    teacher_id UUID REFERENCES users(id) ON DELETE SET NULL,
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(child_id, month, year)
+);
+
+-- Simplified Activities
+CREATE TABLE IF NOT EXISTS activities (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    school_id UUID REFERENCES schools(id) ON DELETE CASCADE,
+    classroom_id UUID REFERENCES classrooms(id) ON DELETE SET NULL,
+    title VARCHAR(200) NOT NULL,
+    date DATE NOT NULL DEFAULT CURRENT_DATE,
+    development_areas TEXT[] DEFAULT '{}',
+    notes TEXT,
+    photos TEXT[] DEFAULT '{}',
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Health & Safety: Incidents
+CREATE TABLE IF NOT EXISTS incidents (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    school_id UUID REFERENCES schools(id) ON DELETE CASCADE,
+    child_id UUID NOT NULL REFERENCES children(id) ON DELETE CASCADE,
+    date DATE NOT NULL DEFAULT CURRENT_DATE,
+    time VARCHAR(20),
+    location VARCHAR(150) NOT NULL DEFAULT 'Playground',
+    description TEXT NOT NULL,
+    action_taken TEXT NOT NULL,
+    parent_notified BOOLEAN DEFAULT true,
+    staff_id UUID REFERENCES users(id) ON DELETE SET NULL,
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_attendance_child_date ON attendance_records(child_id, date);
+CREATE INDEX IF NOT EXISTS idx_observations_child ON development_observations(child_id);
+CREATE INDEX IF NOT EXISTS idx_monthly_reports_child ON monthly_reports(child_id, month, year);
+CREATE INDEX IF NOT EXISTS idx_incidents_child ON incidents(child_id);

@@ -58,17 +58,19 @@ export async function runPortalTests(): Promise<{ passed: number; failed: number
     assert(!!emma, 'Parent Sarah is correctly linked to Emma Johnson');
     assert(emma?.calculated_age.formatted.includes('year'), 'Calculated age present in parent portal view');
 
-    // 6. Child Live Feed & Daily Care Status
+    // 6. Child Live Feed & Monthly Progress Report (Simplified Early Years Spec)
     if (emma) {
       const feed = await PortalService.getChildLiveFeed(sarahId, emma.id);
-      assert(!!feed.todayLive, 'Live daily feed structure returned');
-      assert(feed.todayLive.attendance.status === 'present', 'Attendance status reflects present');
-      assert(feed.todayLive.meals.length >= 3, 'Meal updates present in daily report');
-      assert(!!feed.todayLive.nap.duration, 'Nap time details present');
-      assert(feed.todayLive.activities.length >= 2, 'Curriculum activities present');
-      assert(!!feed.todayLive.teacherNote.message, 'Teacher daily note is populated');
-      assert(feed.milestones.length >= 3, 'Development milestones returned for portfolio');
+      assert(!!feed.attendanceSummary, 'Attendance summary returned');
+      assert(feed.attendanceSummary.todayStatus === 'present', 'Attendance status reflects present');
+      assert(feed.attendanceSummary.present === 20, 'Monthly attendance present days count is 20');
+      assert(!!feed.monthlyProgress, 'Monthly progress report returned');
+      assert(feed.monthlyProgress.status === 'published', 'Monthly report is published');
+      assert(feed.monthlyProgress.domains.length === 6, '6 early years developmental domains evaluated');
+      assert(!!feed.monthlyProgress.teacherSummary, 'Teacher monthly summary narrative present');
+      assert(feed.activities.length >= 2, 'Recent classroom activities present');
       assert(feed.moments.length >= 2, 'Classroom moment photos returned');
+      assert(feed.authorizedPickups.length >= 1, 'Authorized pickups list returned');
     }
 
     // 7. Security Isolation: Parent cannot access unauthorized child
