@@ -168,10 +168,10 @@ export const App: React.FC = () => {
 
     // Early Years Development & Monthly Progress (Ages 1–6)
     if (currentPath.startsWith('/development/monthly-progress')) {
-      return <MonthlyProgressPage />;
+      return <MonthlyProgressPage onNavigate={setCurrentPath} />;
     }
     if (currentPath.startsWith('/development')) {
-      return <ObservationsPage />;
+      return <ObservationsPage onNavigate={setCurrentPath} />;
     }
 
     // Play-Based Classroom Activities
