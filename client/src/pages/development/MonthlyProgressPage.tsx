@@ -6,25 +6,15 @@ import {
   Clock,
   Send,
   Printer,
-  FileText,
-  User,
-  Filter,
   Save,
-  BookOpen,
-  Award,
   ChevronRight,
   ChevronLeft,
   Eye,
   X,
-  HelpCircle,
-  TrendingUp,
-  Smile,
+  Award,
   Heart,
-  Brain,
-  MessageCircle,
-  Activity,
-  Palette,
-  BookMarked
+  Smile,
+  BookOpen
 } from 'lucide-react';
 import { api } from '../../services/api.js';
 
@@ -35,8 +25,14 @@ interface SkillItem {
 
 interface DomainProgress {
   area: string;
+  shortName: string;
   icon: string;
-  color: string;
+  theme: {
+    bg: string;
+    border: string;
+    text: string;
+    badge: string;
+  };
   status: 'Emerging' | 'Developing' | 'Achieved';
   skills: SkillItem[];
   note: string;
@@ -59,48 +55,52 @@ interface MonthlyReport {
 
 const DEFAULT_DOMAINS: DomainProgress[] = [
   {
-    area: 'Cognitive',
+    area: 'Cognitive & Thinking',
+    shortName: 'Thinking',
     icon: '🧩',
-    color: '#3B82F6',
+    theme: { bg: 'bg-blue-50/60', border: 'border-blue-200', text: 'text-blue-900', badge: 'bg-blue-100 text-blue-800' },
     status: 'Achieved',
     skills: [
       { name: 'Explores cause and effect with materials', status: 'Achieved' },
       { name: 'Sorts objects by color, shape, and size', status: 'Achieved' },
-      { name: 'Counts objects up to 10 with 1-to-1 correspondence', status: 'Developing' },
-      { name: 'Solves simple 6-8 piece floor puzzles', status: 'Achieved' },
+      { name: 'Counts objects with 1-to-1 correspondence', status: 'Developing' },
+      { name: 'Solves simple floor puzzles with focus', status: 'Achieved' },
     ],
     note: 'Eager problem-solver; loves math counters and pattern blocks.',
   },
   {
-    area: 'Language & Communication',
+    area: 'Language & Speech',
+    shortName: 'Speech',
     icon: '🗣️',
-    color: '#8B5CF6',
+    theme: { bg: 'bg-purple-50/60', border: 'border-purple-200', text: 'text-purple-900', badge: 'bg-purple-100 text-purple-800' },
     status: 'Developing',
     skills: [
       { name: 'Expresses needs, feelings, and ideas clearly', status: 'Achieved' },
       { name: 'Listens attentively during group story circle', status: 'Developing' },
       { name: 'Follows 2-to-3 step verbal instructions', status: 'Developing' },
-      { name: 'Asks "why" and descriptive questions', status: 'Achieved' },
+      { name: 'Asks descriptive questions and shares thoughts', status: 'Achieved' },
     ],
     note: 'Expanding vocabulary rapidly in both English and home language.',
   },
   {
     area: 'Social & Emotional',
+    shortName: 'Feelings & Friends',
     icon: '💛',
-    color: '#F59E0B',
+    theme: { bg: 'bg-amber-50/60', border: 'border-amber-200', text: 'text-amber-900', badge: 'bg-amber-100 text-amber-800' },
     status: 'Achieved',
     skills: [
       { name: 'Shares toys and takes turns with peers', status: 'Achieved' },
       { name: 'Shows empathy toward peers when they are upset', status: 'Achieved' },
       { name: 'Transitions smoothly between classroom routines', status: 'Achieved' },
-      { name: 'Engages in cooperative group play', status: 'Developing' },
+      { name: 'Engages in joyful cooperative group play', status: 'Developing' },
     ],
     note: 'Very kind peer; welcomed new classmates warmly.',
   },
   {
-    area: 'Physical Development',
+    area: 'Physical & Movement',
+    shortName: 'Movement',
     icon: '🏃',
-    color: '#10B981',
+    theme: { bg: 'bg-emerald-50/60', border: 'border-emerald-200', text: 'text-emerald-900', badge: 'bg-emerald-100 text-emerald-800' },
     status: 'Developing',
     skills: [
       { name: 'Gross motor: Jumps, balances, runs safely outdoors', status: 'Achieved' },
@@ -111,9 +111,10 @@ const DEFAULT_DOMAINS: DomainProgress[] = [
     note: 'Excellent physical coordination during outdoor playground play.',
   },
   {
-    area: 'Creative Arts',
+    area: 'Creative & Art',
+    shortName: 'Creativity',
     icon: '🎨',
-    color: '#EC4899',
+    theme: { bg: 'bg-pink-50/60', border: 'border-pink-200', text: 'text-pink-900', badge: 'bg-pink-100 text-pink-800' },
     status: 'Achieved',
     skills: [
       { name: 'Explores textures, colors, and clay freely', status: 'Achieved' },
@@ -123,9 +124,10 @@ const DEFAULT_DOMAINS: DomainProgress[] = [
     note: 'Loves the sensory paint station; created beautiful watercolor pieces.',
   },
   {
-    area: 'Early Literacy',
+    area: 'Early Literacy & Reading',
+    shortName: 'Reading',
     icon: '📖',
-    color: '#06B6D4',
+    theme: { bg: 'bg-cyan-50/60', border: 'border-cyan-200', text: 'text-cyan-900', badge: 'bg-cyan-100 text-cyan-800' },
     status: 'Developing',
     skills: [
       { name: 'Recognizes own printed name on cubby & art', status: 'Achieved' },
@@ -138,49 +140,43 @@ const DEFAULT_DOMAINS: DomainProgress[] = [
 ];
 
 const DOMAIN_NOTE_SUGGESTIONS: Record<string, string[]> = {
-  Cognitive: [
-    'Demonstrates curious problem-solving skills.',
-    'Quickly grasps sorting and classification activities.',
-    'Shows strong focus during building block activities.',
-    'Recognizes number patterns with confidence.',
+  'Cognitive & Thinking': [
+    'Curious and enthusiastic problem-solver.',
+    'Quickly grasps color and pattern sorting.',
+    'Shows wonderful focus during building activities.',
   ],
-  'Language & Communication': [
-    'Expresses ideas with clear multi-word sentences.',
-    'Enthusiastic participant in circle time discussions.',
+  'Language & Speech': [
+    'Speaks in clear, expressive sentences.',
+    'Loves participating in circle storytime.',
     'Listens attentively and asks thoughtful questions.',
-    'Vocabulary is flourishing every week.',
   ],
   'Social & Emotional': [
-    'Demonstrates empathy and kindness to friends.',
-    'Shares toys willingly and takes turns smoothly.',
-    'Handles classroom transitions with calm confidence.',
-    'Builds warm, cooperative friendships.',
+    'Very gentle and considerate with friends.',
+    'Takes turns and shares toys happily.',
+    'Comfortable and calm during classroom transitions.',
   ],
-  'Physical Development': [
-    'Displays great agility and balance outdoors.',
+  'Physical & Movement': [
+    'Agile, joyful runner and climber outdoors.',
     'Fine motor scissor control is progressing well.',
-    'Pencil grasp has matured to a steady tripod hold.',
-    'Independent with shoes and jacket routines.',
+    'Proud of putting on own jacket and shoes.',
   ],
-  'Creative Arts': [
-    'Expresses feelings freely through painting and clay.',
+  'Creative & Art': [
+    'Deeply engaged in sensory watercolor painting.',
     'Loves singing along with rhythm instruments.',
-    'Creates elaborate pretend-play scenarios.',
-    'Fascinated by blending colors on the easel.',
+    'Imaginative pretend play with dramatic costumes.',
   ],
-  'Early Literacy': [
-    'Points to and identifies own written name.',
-    'Shows genuine affection for reading corner books.',
-    'Connecting initial phonetic sounds accurately.',
-    'Loves retelling story plots in own words.',
+  'Early Literacy & Reading': [
+    'Proudly recognizes own printed name.',
+    'Enjoys quiet time browsing picture books.',
+    'Points to letter sounds with growing confidence.',
   ],
 };
 
-const CLASSROOM_SECTIONS = [
-  { id: 'Sunshine Classroom (KG 1)', name: 'Sunshine', section: 'KG 1', ages: '3–4 Years', icon: '☀️' },
-  { id: 'Rainbow Classroom (Nursery)', name: 'Rainbow', section: 'Nursery', ages: '2–3 Years', icon: '🌈' },
-  { id: 'Butterfly Room (Toddlers)', name: 'Butterfly', section: 'Toddlers', ages: '1–2 Years', icon: '🦋' },
-  { id: 'Little Explorers (KG 2)', name: 'Little Explorers', section: 'KG 2', ages: '4–5 Years', icon: '🔍' },
+const CLASSROOMS = [
+  { id: 'Sunshine Classroom (KG 1)', name: 'Sunshine (KG1)', icon: '☀️' },
+  { id: 'Rainbow Classroom (Nursery)', name: 'Rainbow (Nursery)', icon: '🌈' },
+  { id: 'Butterfly Room (Toddlers)', name: 'Butterfly (Toddlers)', icon: '🦋' },
+  { id: 'Little Explorers (KG 2)', name: 'Little Explorers (KG2)', icon: '🔍' },
 ];
 
 interface MonthlyProgressPageProps {
@@ -193,15 +189,14 @@ export const MonthlyProgressPage: React.FC<MonthlyProgressPageProps> = ({ onNavi
   const [selectedChildId, setSelectedChildId] = useState<string>('');
   const [selectedMonth, setSelectedMonth] = useState<string>('September 2026');
   const [selectedClassroom, setSelectedClassroom] = useState<string>('Sunshine Classroom (KG 1)');
-  const [selectedDomainFilter, setSelectedDomainFilter] = useState<string>('all');
+  const [activeDomainTab, setActiveDomainTab] = useState<number>(0); // 0 to 5 for focused domain
   const [loading, setLoading] = useState(true);
   const [showPreviewModal, setShowPreviewModal] = useState(false);
-  const [showGuideModal, setShowGuideModal] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
-    setTimeout(() => setToastMessage(''), 3500);
+    setTimeout(() => setToastMessage(''), 3000);
   };
 
   useEffect(() => {
@@ -231,8 +226,8 @@ export const MonthlyProgressPage: React.FC<MonthlyProgressPageProps> = ({ onNavi
               late: index === 5 ? 2 : 0,
             },
             domains: JSON.parse(JSON.stringify(DEFAULT_DOMAINS)),
-            teacherSummary: `${c.first_name} has made delightful strides this month across all learning zones! They approach activities with enthusiasm, embrace storytime with curious questions, and show warm kindness to peers during cooperative center play.`,
-            highlights: `Proudly completed an intricate bead pattern necklace and taught a classmate the alternating sequence; showed exceptional empathy when helping a friend put on their outdoor play shoes.`,
+            teacherSummary: `${c.first_name} has had a joyful, flourishing month! They approach classroom activities with bright curiosity, listen attentively during story circles, and show heartwarming empathy to friends during playtime.`,
+            highlights: `Proudly completed an intricate bead pattern necklace and taught a classmate the alternating colors; showed kindness helping a friend put on outdoor shoes.`,
             status: index === 0 ? 'published' : 'draft',
             publishedAt: index === 0 ? 'Sep 15, 2026' : undefined,
             teacherName: 'Teacher Helen Brooks',
@@ -245,12 +240,12 @@ export const MonthlyProgressPage: React.FC<MonthlyProgressPageProps> = ({ onNavi
 
   const activeReport = selectedChildId ? reports[selectedChildId] : null;
 
-  // Filter children by selected classroom section
+  // Filter children by selected classroom
   const sectionChildren = children.filter((c) => {
     if (selectedClassroom.includes('Sunshine')) return c.classroom_name?.includes('Sunshine') || !c.classroom_name;
     if (selectedClassroom.includes('Rainbow')) return c.classroom_name?.includes('Rainbow');
     if (selectedClassroom.includes('Butterfly')) return c.classroom_name?.includes('Butterfly');
-    if (selectedClassroom.includes('Little Explorers')) return c.classroom_name?.includes('Little Explorers') || c.classroom_name?.includes('Pre-K');
+    if (selectedClassroom.includes('Little Explorers')) return c.classroom_name?.includes('Little Explorers');
     return true;
   });
 
@@ -268,13 +263,6 @@ export const MonthlyProgressPage: React.FC<MonthlyProgressPageProps> = ({ onNavi
     }
   };
 
-  const updateDomainStatus = (domainIndex: number, status: 'Emerging' | 'Developing' | 'Achieved') => {
-    if (!activeReport) return;
-    const updated = { ...reports };
-    updated[selectedChildId].domains[domainIndex].status = status;
-    setReports(updated);
-  };
-
   const updateSkillStatus = (
     domainIndex: number,
     skillIndex: number,
@@ -283,6 +271,19 @@ export const MonthlyProgressPage: React.FC<MonthlyProgressPageProps> = ({ onNavi
     if (!activeReport) return;
     const updated = { ...reports };
     updated[selectedChildId].domains[domainIndex].skills[skillIndex].status = status;
+
+    // Recalculate overall domain status automatically
+    const skills = updated[selectedChildId].domains[domainIndex].skills;
+    const achievedCount = skills.filter((s) => s.status === 'Achieved').length;
+    const emergingCount = skills.filter((s) => s.status === 'Emerging').length;
+    if (achievedCount >= 3) {
+      updated[selectedChildId].domains[domainIndex].status = 'Achieved';
+    } else if (emergingCount >= 3) {
+      updated[selectedChildId].domains[domainIndex].status = 'Emerging';
+    } else {
+      updated[selectedChildId].domains[domainIndex].status = 'Developing';
+    }
+
     setReports(updated);
   };
 
@@ -315,7 +316,7 @@ export const MonthlyProgressPage: React.FC<MonthlyProgressPageProps> = ({ onNavi
   };
 
   const handleSaveDraft = () => {
-    showToast('Draft progress review saved successfully.');
+    showToast('Draft progress review saved.');
   };
 
   const handlePublish = () => {
@@ -328,35 +329,22 @@ export const MonthlyProgressPage: React.FC<MonthlyProgressPageProps> = ({ onNavi
       year: 'numeric',
     });
     setReports(updated);
-    showToast('Monthly Progress Report published! It is now accessible to parents in their portal.');
+    showToast('Report published! Parents can now view this in their portal.');
   };
 
-  const getStatusBadge = (status: 'Emerging' | 'Developing' | 'Achieved') => {
-    switch (status) {
-      case 'Achieved':
-        return 'bg-emerald-100 text-emerald-800 border-emerald-300';
-      case 'Developing':
-        return 'bg-blue-100 text-blue-800 border-blue-300';
-      case 'Emerging':
-        return 'bg-amber-100 text-amber-800 border-amber-300';
-    }
-  };
-
-  // Calculate completion stats for active report
+  // Calculate stats
   const calculateStats = () => {
-    if (!activeReport) return { total: 0, achieved: 0, developing: 0, percentage: 0 };
+    if (!activeReport) return { achieved: 0, total: 0, percentage: 0 };
     let total = 0;
     let achieved = 0;
-    let developing = 0;
     activeReport.domains.forEach((d) => {
       d.skills.forEach((s) => {
         total++;
         if (s.status === 'Achieved') achieved++;
-        if (s.status === 'Developing') developing++;
       });
     });
-    const percentage = Math.round(((achieved + developing * 0.5) / total) * 100);
-    return { total, achieved, developing, percentage };
+    const percentage = total > 0 ? Math.round((achieved / total) * 100) : 0;
+    return { achieved, total, percentage };
   };
 
   const stats = calculateStats();
@@ -367,584 +355,410 @@ export const MonthlyProgressPage: React.FC<MonthlyProgressPageProps> = ({ onNavi
         <div className="w-12 h-12 rounded-3xl bg-gradient-to-tr from-[#20BDB2] to-[#38D3C7] text-white flex items-center justify-center mx-auto mb-3 animate-pulse shadow-md text-xl">
           🌱
         </div>
-        <p className="font-bold text-[#0B4E49] font-['Quicksand']">Loading Development Sections &amp; Monthly Review...</p>
+        <p className="font-bold text-[#0B4E49] font-['Quicksand']">Loading Development Sections...</p>
       </div>
     );
   }
 
-  const filteredDomains = activeReport
-    ? selectedDomainFilter === 'all'
-      ? activeReport.domains
-      : activeReport.domains.filter((d) => d.area === selectedDomainFilter)
-    : [];
+  const currentDomain = activeReport ? activeReport.domains[activeDomainTab] : null;
 
   return (
-    <div className="space-y-6 max-w-6xl mx-auto pb-14 font-sans">
-      {/* Top Module Sub-Navigation Bar */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-white p-2 rounded-3xl border border-ivory-300 shadow-2xs font-['Quicksand']">
-        <div className="flex items-center gap-1.5 overflow-x-auto w-full sm:w-auto">
-          <button
-            className="px-4 py-2 rounded-2xl text-xs font-bold bg-gradient-to-r from-[#20BDB2] to-[#38D3C7] text-white shadow-xs flex items-center gap-1.5 shrink-0"
-          >
-            <Award size={14} />
-            <span>Monthly Progress Reports</span>
-          </button>
-          <button
-            onClick={() => onNavigate ? onNavigate('/development/observations') : undefined}
-            className="px-4 py-2 rounded-2xl text-xs font-bold text-ink-600 hover:bg-ivory-100 transition flex items-center gap-1.5 shrink-0"
-          >
-            <Sparkles size={14} className="text-[#21B8AF]" />
-            <span>Observation Feed</span>
-          </button>
-          <button
-            onClick={() => setShowGuideModal(true)}
-            className="px-4 py-2 rounded-2xl text-xs font-bold text-ink-600 hover:bg-ivory-100 transition flex items-center gap-1.5 shrink-0"
-          >
-            <HelpCircle size={14} className="text-amber-500" />
-            <span>Milestones Framework Guide</span>
-          </button>
+    <div className="space-y-5 max-w-5xl mx-auto pb-14 font-sans">
+      {/* Toast Notification */}
+      {toastMessage && (
+        <div className="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs flex items-center justify-between shadow-xs animate-in fade-in">
+          <div className="flex items-center gap-2">
+            <CheckCircle2 size={16} className="text-emerald-600 shrink-0" />
+            <span className="font-semibold font-['Outfit']">{toastMessage}</span>
+          </div>
+        </div>
+      )}
+
+      {/* Friendly Top Header Bar */}
+      <div className="bg-white p-4 sm:p-5 rounded-3xl border border-ivory-300 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div>
+          <div className="flex items-center gap-2">
+            <span className="text-xl">🌱</span>
+            <h2 className="text-xl sm:text-2xl font-extrabold text-ink-900 font-['Quicksand']">
+              Child Development &amp; Monthly Review
+            </h2>
+          </div>
+          <p className="text-xs text-ink-500 font-['Outfit'] mt-0.5">
+            A simple, warm way to observe and share early childhood milestones across 6 core areas.
+          </p>
         </div>
 
-        <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+        {/* Action Buttons */}
+        <div className="flex items-center gap-2 w-full md:w-auto justify-end font-['Quicksand']">
           <button
             onClick={() => setShowPreviewModal(true)}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-2xl bg-white hover:bg-ivory-100 text-ink-800 text-xs font-bold transition border border-ivory-300 shadow-2xs"
+            className="px-3.5 py-2 rounded-2xl bg-white hover:bg-ivory-100 text-ink-800 text-xs font-bold transition border border-ivory-300 shadow-2xs flex items-center gap-1.5"
           >
             <Eye size={14} className="text-[#21B8AF]" />
-            <span>Preview Report (1–2 Pages)</span>
+            <span>Preview Parent Report</span>
           </button>
           <button
             onClick={handleSaveDraft}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-2xl bg-ivory-100 hover:bg-ivory-200 text-ink-800 text-xs font-bold transition border border-ivory-300"
+            className="px-3.5 py-2 rounded-2xl bg-ivory-100 hover:bg-ivory-200 text-ink-800 text-xs font-bold transition border border-ivory-200"
           >
-            <Save size={14} />
-            <span>Save Draft</span>
+            Save Draft
           </button>
           <button
             onClick={handlePublish}
-            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-2xl bg-gradient-to-r from-[#20BDB2] to-[#38D3C7] hover:from-[#1BA49A] hover:to-[#29BCB1] text-white text-xs font-bold shadow-sm shadow-[#21B8AF]/25 transition"
+            className="px-4 py-2 rounded-2xl bg-gradient-to-r from-[#20BDB2] to-[#38D3C7] hover:from-[#1BA49A] hover:to-[#29BCB1] text-white text-xs font-bold shadow-sm shadow-[#21B8AF]/25 transition flex items-center gap-1.5"
           >
-            <Send size={14} />
+            <Send size={13} />
             <span>Publish to Portal</span>
           </button>
         </div>
       </div>
 
-      {/* Page Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-        <div>
-          <div className="flex items-center gap-2">
-            <h2 className="text-2xl font-extrabold text-ink-900 font-['Quicksand']">
-              Early Years Development &amp; Monthly Progress
-            </h2>
-            <span className="bg-[#E0F7F4] text-[#0B4E49] text-xs font-bold px-2.5 py-0.5 rounded-full border border-[#C3EFEB] font-['Quicksand']">
-              Ages 1–6
-            </span>
-          </div>
-          <p className="text-xs sm:text-sm text-ink-500 font-['Outfit'] mt-0.5">
-            Holistic child assessment structured across the 6 Early Years domain sections with printable parent reports.
-          </p>
-        </div>
-
-        {/* Reporting Period Selector */}
-        <div className="flex items-center gap-2 bg-white px-3 py-1.5 rounded-2xl border border-ivory-300 shadow-2xs text-xs font-['Quicksand']">
-          <Calendar size={14} className="text-[#21B8AF]" />
-          <span className="font-bold text-ink-600">Period:</span>
-          <select
-            value={selectedMonth}
-            onChange={(e) => setSelectedMonth(e.target.value)}
-            className="bg-transparent font-bold text-ink-900 focus:outline-none cursor-pointer"
-          >
-            <option>September 2026</option>
-            <option>October 2026</option>
-            <option>November 2026</option>
-            <option>December 2026</option>
-          </select>
-        </div>
-      </div>
-
-      {/* Toast Alert */}
-      {toastMessage && (
-        <div className="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs flex items-center justify-between shadow-xs font-['Outfit'] animate-in fade-in">
-          <div className="flex items-center gap-2">
-            <CheckCircle2 size={16} className="text-emerald-600 shrink-0" />
-            <span className="font-semibold">{toastMessage}</span>
-          </div>
-        </div>
-      )}
-
-      {/* Classroom Sections Selector Pills */}
-      <div className="flex flex-wrap items-center gap-2 p-2 rounded-3xl bg-white border border-ivory-300 shadow-2xs font-['Quicksand']">
-        <span className="text-xs font-bold text-ink-500 px-2">Classroom Section:</span>
-        {CLASSROOM_SECTIONS.map((sec) => {
-          const isSelected = selectedClassroom === sec.id;
-          return (
-            <button
-              key={sec.id}
-              onClick={() => {
-                setSelectedClassroom(sec.id);
-                // Auto select first child of this section
-                const firstChild = children.find((c) => c.classroom_name === sec.id || c.classroom_name?.includes(sec.name));
-                if (firstChild) setSelectedChildId(firstChild.id);
-              }}
-              className={`px-3.5 py-1.5 rounded-2xl text-xs font-bold transition-all flex items-center gap-1.5 ${
-                isSelected
-                  ? 'bg-gradient-to-r from-[#20BDB2] to-[#38D3C7] text-white shadow-xs'
-                  : 'bg-ivory-50 text-ink-700 hover:bg-[#F0FBF9] hover:text-[#0B4E49] border border-ivory-200'
-              }`}
-            >
-              <span>{sec.icon}</span>
-              <span>{sec.name} ({sec.section})</span>
-              <span
-                className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
-                  isSelected ? 'bg-white/25 text-white' : 'bg-ivory-200 text-ink-600'
-                }`}
-              >
-                {sec.ages}
-              </span>
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Child Navigator Bar: Prev Child | Current Child Dropdown | Next Child */}
-      {activeReport && (
-        <div className="bg-white p-3.5 rounded-3xl border border-ivory-300 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-3 font-['Outfit']">
-          <div className="flex items-center gap-3 w-full sm:w-auto">
-            <button
-              onClick={handlePrevChild}
-              disabled={currentChildIndex <= 0}
-              className="p-2 rounded-xl bg-ivory-100 hover:bg-ivory-200 disabled:opacity-30 disabled:cursor-not-allowed text-ink-700 transition"
-              title="Previous Child Roster"
-            >
-              <ChevronLeft size={16} />
-            </button>
-
-            <div className="flex items-center gap-2.5">
-              <div className="w-10 h-10 rounded-2xl bg-[#E0F7F4] text-[#0B4E49] font-bold text-sm flex items-center justify-center border border-[#C3EFEB] font-['Quicksand']">
-                {activeReport.childName[0]}
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <select
-                    value={selectedChildId}
-                    onChange={(e) => setSelectedChildId(e.target.value)}
-                    className="font-extrabold text-sm text-ink-900 bg-transparent border-b border-[#21B8AF] pb-0.5 focus:outline-none cursor-pointer font-['Quicksand']"
-                  >
-                    {sectionChildren.map((c, idx) => (
-                      <option key={c.id} value={c.id}>
-                        {idx + 1}. {c.first_name} {c.last_name} ({c.calculated_age?.formatted || 'Early Years'})
-                      </option>
-                    ))}
-                  </select>
-                  <span
-                    className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                      activeReport.status === 'published'
-                        ? 'bg-emerald-100 text-emerald-800 border border-emerald-200'
-                        : 'bg-amber-100 text-amber-800 border border-amber-200'
-                    }`}
-                  >
-                    {activeReport.status === 'published' ? '✓ Published' : '○ Draft'}
-                  </span>
-                </div>
-                <p className="text-[11px] text-ink-500 mt-0.5">
-                  Child {currentChildIndex + 1} of {sectionChildren.length} in this section • Room: {activeReport.classroom}
-                </p>
-              </div>
-            </div>
-
-            <button
-              onClick={handleNextChild}
-              disabled={currentChildIndex >= sectionChildren.length - 1}
-              className="p-2 rounded-xl bg-ivory-100 hover:bg-ivory-200 disabled:opacity-30 disabled:cursor-not-allowed text-ink-700 transition"
-              title="Next Child Roster"
-            >
-              <ChevronRight size={16} />
-            </button>
-          </div>
-
-          {/* Quick Stats Indicator */}
-          <div className="flex items-center gap-4 text-xs">
-            <div className="flex items-center gap-2">
-              <span className="text-ink-500 font-medium">Milestones Achieved:</span>
-              <span className="font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-lg border border-emerald-200">
-                {stats.achieved} / {stats.total}
-              </span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-ink-500 font-medium">Progress Index:</span>
-              <span className="font-bold text-[#0B4E49] bg-[#E0F7F4] px-2 py-0.5 rounded-lg border border-[#C3EFEB]">
-                {stats.percentage}%
-              </span>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Main Review Form */}
-      {activeReport && (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-          {/* Left Column (2 Cols): Developmental Sections */}
-          <div className="lg:col-span-2 space-y-4 font-['Outfit']">
-            {/* Domain Section Filter Pills */}
-            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 font-['Quicksand']">
-              <span className="text-xs font-bold text-ink-500 shrink-0 mr-1 flex items-center gap-1">
-                <Filter size={13} /> Section:
-              </span>
-              <button
-                onClick={() => setSelectedDomainFilter('all')}
-                className={`px-3 py-1 rounded-xl text-xs font-bold transition shrink-0 ${
-                  selectedDomainFilter === 'all'
-                    ? 'bg-[#0B4E49] text-white shadow-2xs'
-                    : 'bg-white hover:bg-ivory-100 text-ink-700 border border-ivory-200'
-                }`}
-              >
-                All 6 Sections
-              </button>
-              {activeReport.domains.map((d) => (
+      {/* Classroom Selection & Child Navigator Strip */}
+      <div className="bg-white p-4 rounded-3xl border border-ivory-300 shadow-xs space-y-3">
+        {/* Row 1: Classroom Pills */}
+        <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-ivory-200">
+          <div className="flex flex-wrap items-center gap-1.5 font-['Quicksand']">
+            <span className="text-xs font-bold text-ink-500 mr-1">Classroom:</span>
+            {CLASSROOMS.map((room) => {
+              const isSelected = selectedClassroom === room.id;
+              return (
                 <button
-                  key={d.area}
-                  onClick={() => setSelectedDomainFilter(d.area)}
-                  className={`px-3 py-1 rounded-xl text-xs font-bold transition shrink-0 flex items-center gap-1 ${
-                    selectedDomainFilter === d.area
+                  key={room.id}
+                  onClick={() => {
+                    setSelectedClassroom(room.id);
+                    const first = children.find((c) => c.classroom_name === room.id || c.classroom_name?.includes(room.name));
+                    if (first) setSelectedChildId(first.id);
+                  }}
+                  className={`px-3 py-1.5 rounded-2xl text-xs font-bold transition flex items-center gap-1.5 ${
+                    isSelected
                       ? 'bg-[#0B4E49] text-white shadow-2xs'
-                      : 'bg-white hover:bg-ivory-100 text-ink-700 border border-ivory-200'
+                      : 'bg-ivory-50 text-ink-700 hover:bg-ivory-100 border border-ivory-200'
                   }`}
                 >
-                  <span>{d.icon}</span>
-                  <span>{d.area}</span>
+                  <span>{room.icon}</span>
+                  <span>{room.name}</span>
                 </button>
-              ))}
-            </div>
-
-            {/* Developmental Domain Sections Cards */}
-            <div className="space-y-4">
-              {filteredDomains.map((domain) => {
-                const originalIndex = activeReport.domains.findIndex((d) => d.area === domain.area);
-                const achievedSkills = domain.skills.filter((s) => s.status === 'Achieved').length;
-
-                return (
-                  <div
-                    key={domain.area}
-                    className="bg-white p-5 rounded-3xl border border-ivory-300 shadow-xs space-y-3.5 hover:border-[#C3EFEB] transition-all"
-                  >
-                    {/* Domain Section Header */}
-                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 pb-2.5 border-b border-ivory-200">
-                      <div className="flex items-center gap-2.5">
-                        <span className="text-2xl">{domain.icon}</span>
-                        <div>
-                          <h3 className="font-extrabold text-sm text-ink-900 font-['Quicksand']">
-                            {domain.area} Section
-                          </h3>
-                          <p className="text-[11px] text-ink-500">
-                            {achievedSkills} of {domain.skills.length} skills achieved • Lead Status: <strong>{domain.status}</strong>
-                          </p>
-                        </div>
-                      </div>
-
-                      {/* Overall Section Status Pills */}
-                      <div className="flex items-center gap-1.5 font-['Quicksand']">
-                        {(['Emerging', 'Developing', 'Achieved'] as const).map((st) => (
-                          <button
-                            key={st}
-                            type="button"
-                            onClick={() => updateDomainStatus(originalIndex, st)}
-                            className={`px-3 py-1 rounded-xl text-xs font-bold border transition ${
-                              domain.status === st
-                                ? getStatusBadge(st) + ' shadow-xs ring-1 ring-offset-1 ring-[#21B8AF]'
-                                : 'bg-ivory-50 text-ink-600 border-ivory-200 hover:bg-ivory-100'
-                            }`}
-                          >
-                            {st === 'Achieved' ? '✓ ' : st === 'Developing' ? '◐ ' : '○ '}
-                            {st}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Tactile 1-Tap Skills Scoring List */}
-                    <div className="space-y-2">
-                      <span className="text-[11px] font-bold text-ink-500 uppercase tracking-wider block">
-                        Milestone Skills Checklist:
-                      </span>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                        {domain.skills.map((skill, sIdx) => (
-                          <div
-                            key={skill.name}
-                            className="p-3 rounded-2xl bg-ivory-50/70 border border-ivory-200 flex flex-col justify-between gap-2"
-                          >
-                            <span className="text-xs text-ink-900 font-medium leading-snug">
-                              {skill.name}
-                            </span>
-
-                            {/* 1-Tap Scoring Pills */}
-                            <div className="grid grid-cols-3 gap-1 font-['Quicksand'] text-[10px] font-bold">
-                              <button
-                                type="button"
-                                onClick={() => updateSkillStatus(originalIndex, sIdx, 'Emerging')}
-                                className={`py-1 rounded-lg transition text-center ${
-                                  skill.status === 'Emerging'
-                                    ? 'bg-amber-500 text-white shadow-2xs'
-                                    : 'bg-white hover:bg-amber-50 text-ink-600 border border-ivory-200'
-                                }`}
-                              >
-                                ○ Emerging
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => updateSkillStatus(originalIndex, sIdx, 'Developing')}
-                                className={`py-1 rounded-lg transition text-center ${
-                                  skill.status === 'Developing'
-                                    ? 'bg-blue-600 text-white shadow-2xs'
-                                    : 'bg-white hover:bg-blue-50 text-ink-600 border border-ivory-200'
-                                }`}
-                              >
-                                ◐ Developing
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => updateSkillStatus(originalIndex, sIdx, 'Achieved')}
-                                className={`py-1 rounded-lg transition text-center ${
-                                  skill.status === 'Achieved'
-                                    ? 'bg-emerald-600 text-white shadow-2xs'
-                                    : 'bg-white hover:bg-emerald-50 text-ink-600 border border-ivory-200'
-                                }`}
-                              >
-                                ✓ Achieved
-                              </button>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Quick Suggested Observation Presets */}
-                    <div className="pt-2 border-t border-ivory-200 space-y-1.5">
-                      <span className="text-[11px] font-bold text-ink-500 flex items-center gap-1">
-                        <Sparkles size={12} className="text-[#21B8AF]" /> Quick Note Suggestions (Tap to add):
-                      </span>
-                      <div className="flex flex-wrap gap-1.5">
-                        {DOMAIN_NOTE_SUGGESTIONS[domain.area]?.map((suggestion, sIndex) => (
-                          <button
-                            key={sIndex}
-                            type="button"
-                            onClick={() => appendDomainNote(originalIndex, suggestion)}
-                            className="text-[11px] px-2.5 py-0.5 rounded-full bg-ivory-100 hover:bg-[#E0F7F4] text-ink-700 hover:text-[#0B4E49] border border-ivory-200 transition"
-                          >
-                            + {suggestion}
-                          </button>
-                        ))}
-                      </div>
-
-                      {/* Custom Teacher Note Textarea */}
-                      <input
-                        type="text"
-                        value={domain.note}
-                        onChange={(e) => updateDomainNote(originalIndex, e.target.value)}
-                        placeholder={`Teacher qualitative note for ${domain.area}...`}
-                        className="w-full px-3.5 py-2 bg-ivory-50 border border-ivory-300 rounded-xl text-xs text-ink-900 focus:outline-none focus:ring-2 focus:ring-[#21B8AF]"
-                      />
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+              );
+            })}
           </div>
 
-          {/* Right Column (1 Col): Child Profile, Attendance, Narrative Summaries */}
-          <div className="space-y-4 font-['Outfit']">
-            {/* Child Header Card */}
-            <div className="bg-white p-5 rounded-3xl border border-ivory-300 shadow-xs space-y-3">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#20BDB2] to-[#38D3C7] text-white font-bold text-lg flex items-center justify-center shadow-xs font-['Quicksand']">
+          {/* Month Selector */}
+          <div className="flex items-center gap-1.5 text-xs text-ink-600 font-['Quicksand']">
+            <Calendar size={13} className="text-[#21B8AF]" />
+            <select
+              value={selectedMonth}
+              onChange={(e) => setSelectedMonth(e.target.value)}
+              className="font-bold text-ink-900 bg-transparent focus:outline-none cursor-pointer"
+            >
+              <option>September 2026</option>
+              <option>October 2026</option>
+              <option>November 2026</option>
+              <option>December 2026</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Row 2: Friendly Child Cycler */}
+        {activeReport && (
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pt-0.5">
+            <div className="flex items-center gap-2 w-full sm:w-auto font-['Outfit']">
+              <button
+                onClick={handlePrevChild}
+                disabled={currentChildIndex <= 0}
+                className="p-2 rounded-2xl bg-ivory-100 hover:bg-ivory-200 disabled:opacity-30 disabled:cursor-not-allowed text-ink-700 transition"
+                title="Previous Child"
+              >
+                <ChevronLeft size={16} />
+              </button>
+
+              <div className="flex items-center gap-2.5">
+                <div className="w-10 h-10 rounded-2xl bg-[#E0F7F4] text-[#0B4E49] font-bold text-sm flex items-center justify-center border border-[#C3EFEB] font-['Quicksand'] shrink-0">
                   {activeReport.childName[0]}
                 </div>
                 <div>
-                  <h3 className="font-extrabold text-sm text-ink-900 font-['Quicksand']">
-                    {activeReport.childName}
-                  </h3>
+                  <div className="flex items-center gap-2">
+                    <select
+                      value={selectedChildId}
+                      onChange={(e) => setSelectedChildId(e.target.value)}
+                      className="font-extrabold text-base text-ink-900 bg-transparent focus:outline-none cursor-pointer font-['Quicksand']"
+                    >
+                      {sectionChildren.map((c, idx) => (
+                        <option key={c.id} value={c.id}>
+                          {idx + 1}. {c.first_name} {c.last_name} ({c.calculated_age?.formatted || 'Early Years'})
+                        </option>
+                      ))}
+                    </select>
+
+                    <span
+                      className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full ${
+                        activeReport.status === 'published'
+                          ? 'bg-emerald-100 text-emerald-800 border border-emerald-200'
+                          : 'bg-amber-100 text-amber-800 border border-amber-200'
+                      }`}
+                    >
+                      {activeReport.status === 'published' ? '✓ Published' : '○ Draft'}
+                    </span>
+                  </div>
                   <p className="text-xs text-ink-500">
-                    {activeReport.classroom} • {activeReport.age}
+                    Child {currentChildIndex + 1} of {sectionChildren.length} in this room
                   </p>
                 </div>
               </div>
 
-              {/* Monthly Attendance Mini Summary */}
-              <div className="p-3 rounded-2xl bg-ivory-50 border border-ivory-200 grid grid-cols-3 gap-2 text-center text-xs">
-                <div>
-                  <span className="text-[10px] text-emerald-700 font-bold block">Present</span>
-                  <strong className="text-ink-900 text-sm">{activeReport.attendanceSummary.present} days</strong>
-                </div>
-                <div>
-                  <span className="text-[10px] text-dustyrose-700 font-bold block">Absent</span>
-                  <strong className="text-ink-900 text-sm">{activeReport.attendanceSummary.absent} days</strong>
-                </div>
-                <div>
-                  <span className="text-[10px] text-amber-700 font-bold block">Late</span>
-                  <strong className="text-ink-900 text-sm">{activeReport.attendanceSummary.late} days</strong>
-                </div>
-              </div>
-
-              {/* Progress Index Bar */}
-              <div className="space-y-1 pt-1">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="font-bold text-ink-700">Development Milestones:</span>
-                  <span className="font-extrabold text-[#0B4E49]">{stats.percentage}%</span>
-                </div>
-                <div className="w-full h-2 rounded-full bg-ivory-200 overflow-hidden">
-                  <div
-                    className="h-full bg-gradient-to-r from-[#20BDB2] to-[#38D3C7] transition-all duration-500 rounded-full"
-                    style={{ width: `${stats.percentage}%` }}
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Teacher Overall Summary */}
-            <div className="bg-white p-5 rounded-3xl border border-ivory-300 shadow-xs space-y-2">
-              <label className="block font-bold text-ink-900 text-xs font-['Quicksand']">
-                Lead Educator Monthly Summary
-              </label>
-              <textarea
-                rows={4}
-                value={activeReport.teacherSummary}
-                onChange={(e) => updateTeacherSummary(e.target.value)}
-                placeholder="Overview of this month's growth, social engagement, and positive milestones..."
-                className="w-full p-3 bg-ivory-50 border border-ivory-300 rounded-2xl text-xs text-ink-900 focus:outline-none focus:ring-2 focus:ring-[#21B8AF] leading-relaxed"
-              />
-              <p className="text-[10px] text-ink-400">
-                This positive narrative summary appears on the first page of the parent report card.
-              </p>
-            </div>
-
-            {/* Classroom Highlights & Joyful Moments */}
-            <div className="bg-white p-5 rounded-3xl border border-ivory-300 shadow-xs space-y-2">
-              <label className="block font-bold text-[#0B4E49] text-xs font-['Quicksand'] flex items-center gap-1.5">
-                <span>🌟 Joyful Classroom Moments &amp; Highlights</span>
-              </label>
-              <textarea
-                rows={3}
-                value={activeReport.highlights}
-                onChange={(e) => updateHighlights(e.target.value)}
-                placeholder="e.g. Favorite discoveries, memorable art moments, sweet interactions..."
-                className="w-full p-3 bg-[#F0FBF9] border border-[#C3EFEB] rounded-2xl text-xs text-ink-900 focus:outline-none focus:ring-2 focus:ring-[#21B8AF] leading-relaxed"
-              />
-            </div>
-
-            {/* Lead Educator Signature Info */}
-            <div className="p-4 rounded-3xl bg-ivory-100/70 border border-ivory-300 text-xs space-y-1">
-              <span className="text-[10px] text-ink-500 font-bold uppercase tracking-wider block">
-                Educator Verification
-              </span>
-              <p className="font-bold text-ink-900">{activeReport.teacherName}</p>
-              <p className="text-[11px] text-ink-600">Lead Early Childhood Educator • {selectedClassroom}</p>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* MILESTONES FRAMEWORK GUIDE MODAL */}
-      {showGuideModal && (
-        <div className="fixed inset-0 z-50 bg-ink-900/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto font-sans">
-          <div className="w-full max-w-3xl bg-white rounded-3xl shadow-2xl border border-ivory-300 overflow-hidden my-8 p-6 space-y-4">
-            <div className="flex items-center justify-between border-b border-ivory-200 pb-3">
-              <div>
-                <h3 className="text-base font-extrabold text-ink-900 font-['Quicksand'] flex items-center gap-2">
-                  <Brain size={18} className="text-[#21B8AF]" />
-                  Early Years Developmental Milestones Guide (Ages 1–6)
-                </h3>
-                <p className="text-xs text-ink-500 font-['Outfit'] mt-0.5">
-                  Core learning expectations across the 4 early childhood classroom sections
-                </p>
-              </div>
               <button
-                onClick={() => setShowGuideModal(false)}
-                className="p-1 text-ink-400 hover:text-ink-700 rounded-lg"
+                onClick={handleNextChild}
+                disabled={currentChildIndex >= sectionChildren.length - 1}
+                className="p-2 rounded-2xl bg-ivory-100 hover:bg-ivory-200 disabled:opacity-30 disabled:cursor-not-allowed text-ink-700 transition"
+                title="Next Child"
               >
-                <X size={18} />
+                <ChevronRight size={16} />
               </button>
             </div>
 
-            <div className="space-y-4 max-h-[70vh] overflow-y-auto pr-1 text-xs font-['Outfit']">
-              {CLASSROOM_SECTIONS.map((sec) => (
-                <div key={sec.id} className="p-4 rounded-2xl bg-ivory-50 border border-ivory-200 space-y-2">
-                  <div className="flex items-center justify-between">
-                    <h4 className="font-bold text-sm text-ink-900 font-['Quicksand'] flex items-center gap-1.5">
-                      <span>{sec.icon}</span>
-                      <span>{sec.name} Section ({sec.ages})</span>
-                    </h4>
-                    <span className="text-[10px] font-bold px-2 py-0.5 bg-[#E0F7F4] text-[#0B4E49] rounded-full border border-[#C3EFEB]">
-                      {sec.section}
-                    </span>
-                  </div>
+            {/* Overall Milestones Progress Pill */}
+            <div className="flex items-center gap-2 text-xs font-['Outfit'] bg-ivory-50 px-3.5 py-1.5 rounded-2xl border border-ivory-200">
+              <span className="text-ink-500 font-medium">Milestones Achieved:</span>
+              <span className="font-extrabold text-[#0B4E49]">
+                {stats.achieved} of {stats.total} ({stats.percentage}%)
+              </span>
+            </div>
+          </div>
+        )}
+      </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 text-[11px] text-ink-700">
-                    <div>
-                      <strong>🧩 Cognitive:</strong>{' '}
-                      {sec.section === 'Toddlers'
-                        ? 'Explores object permanence, stacks 3-4 blocks, curious exploration.'
-                        : sec.section === 'Nursery'
-                        ? 'Sorts by shape/color, simple 4-piece puzzles, cause and effect.'
-                        : sec.section === 'KG 1'
-                        ? 'Counts to 10 with 1-to-1 correspondence, completes patterns.'
-                        : 'Counts to 20+, solves simple logic problems, simple addition concepts.'}
-                    </div>
-                    <div>
-                      <strong>🗣️ Language:</strong>{' '}
-                      {sec.section === 'Toddlers'
-                        ? 'Single words, points to desired items, mimics speech sounds.'
-                        : sec.section === 'Nursery'
-                        ? '2-3 word sentences, asks "what" and "where", enjoys nursery rhymes.'
-                        : sec.section === 'KG 1'
-                        ? 'Speaks in full sentences, follows 2-step directions, asks descriptive questions.'
-                        : 'Narrates detailed stories, phonemic sound awareness, follows 3-step directions.'}
-                    </div>
-                    <div>
-                      <strong>💛 Social:</strong>{' '}
-                      {sec.section === 'Toddlers'
-                        ? 'Parallel play alongside peers, early imitation of daily routines.'
-                        : sec.section === 'Nursery'
-                        ? 'Begins taking turns with adult guidance, expresses basic emotions.'
-                        : sec.section === 'KG 1'
-                        ? 'Engages in cooperative group play, shows empathy to friends.'
-                        : 'Resolves minor conflicts with words, team games, self-regulation.'}
-                    </div>
-                    <div>
-                      <strong>🏃 Physical:</strong>{' '}
-                      {sec.section === 'Toddlers'
-                        ? 'Steady walking, squats without falling, scribbles with fists.'
-                        : sec.section === 'Nursery'
-                        ? 'Jumps with both feet, snips paper with safety scissors.'
-                        : sec.section === 'KG 1'
-                        ? 'Balances on one foot, cuts along straight lines, developing tripod grip.'
-                        : 'Skips and hops, cuts complex shapes, mature dynamic tripod pencil grasp.'}
-                    </div>
+      {/* 6 Developmental Domain Section Tabs (Clean & Friendly) */}
+      {activeReport && (
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 font-['Quicksand']">
+          {activeReport.domains.map((dom, index) => {
+            const isTabActive = activeDomainTab === index;
+            const achievedInDomain = dom.skills.filter((s) => s.status === 'Achieved').length;
+
+            return (
+              <button
+                key={dom.area}
+                onClick={() => setActiveDomainTab(index)}
+                className={`p-3 rounded-2xl text-left transition-all border ${
+                  isTabActive
+                    ? 'bg-white border-[#21B8AF] ring-2 ring-[#21B8AF]/30 shadow-xs'
+                    : 'bg-white/80 border-ivory-300 hover:border-ivory-400 hover:bg-white'
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-xl">{dom.icon}</span>
+                  <span
+                    className={`text-[10px] font-bold px-1.5 py-0.2 rounded-full ${
+                      achievedInDomain === dom.skills.length
+                        ? 'bg-emerald-100 text-emerald-800'
+                        : 'bg-ivory-100 text-ink-600'
+                    }`}
+                  >
+                    {achievedInDomain}/{dom.skills.length}
+                  </span>
+                </div>
+                <p className="font-bold text-xs text-ink-900 mt-1.5 truncate">
+                  {dom.shortName}
+                </p>
+                <span className="text-[10px] text-ink-400 block">
+                  {dom.status}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Active Domain Card (Spacious, Clean, Friendly) */}
+      {activeReport && currentDomain && (
+        <div className="bg-white p-6 rounded-3xl border border-ivory-300 shadow-xs space-y-5 font-['Outfit']">
+          {/* Header of Active Domain */}
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b border-ivory-200">
+            <div className="flex items-center gap-3">
+              <span className="text-3xl">{currentDomain.icon}</span>
+              <div>
+                <h3 className="text-lg font-extrabold text-ink-900 font-['Quicksand']">
+                  {currentDomain.area}
+                </h3>
+                <p className="text-xs text-ink-500">
+                  Tap to update each milestone skill below for {activeReport.childName}
+                </p>
+              </div>
+            </div>
+
+            {/* Overall Domain Status Pill */}
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-medium text-ink-500">Domain Status:</span>
+              <span
+                className={`text-xs font-bold px-3 py-1 rounded-xl border ${
+                  currentDomain.status === 'Achieved'
+                    ? 'bg-emerald-100 text-emerald-800 border-emerald-300'
+                    : currentDomain.status === 'Developing'
+                    ? 'bg-blue-100 text-blue-800 border-blue-300'
+                    : 'bg-amber-100 text-amber-800 border-amber-300'
+                }`}
+              >
+                {currentDomain.status === 'Achieved' ? '✓ ' : currentDomain.status === 'Developing' ? '◐ ' : '○ '}
+                {currentDomain.status}
+              </span>
+            </div>
+          </div>
+
+          {/* Clean Skills List with 3-Option Toggles */}
+          <div className="space-y-2.5">
+            <span className="text-xs font-bold text-ink-600 font-['Quicksand'] block">
+              Observed Skills &amp; Growth Milestones:
+            </span>
+            <div className="grid grid-cols-1 gap-2.5">
+              {currentDomain.skills.map((skill, sIdx) => (
+                <div
+                  key={skill.name}
+                  className="p-3.5 rounded-2xl bg-ivory-50/70 border border-ivory-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 hover:bg-ivory-50 transition"
+                >
+                  <span className="text-xs font-semibold text-ink-900 leading-snug">
+                    {skill.name}
+                  </span>
+
+                  {/* 3 Friendly Status Pills */}
+                  <div className="flex items-center gap-1.5 font-['Quicksand'] text-[11px] font-bold shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => updateSkillStatus(activeDomainTab, sIdx, 'Emerging')}
+                      className={`px-3 py-1.5 rounded-xl transition ${
+                        skill.status === 'Emerging'
+                          ? 'bg-amber-500 text-white shadow-2xs font-extrabold'
+                          : 'bg-white hover:bg-amber-50 text-ink-600 border border-ivory-200'
+                      }`}
+                    >
+                      ○ Emerging
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => updateSkillStatus(activeDomainTab, sIdx, 'Developing')}
+                      className={`px-3 py-1.5 rounded-xl transition ${
+                        skill.status === 'Developing'
+                          ? 'bg-blue-600 text-white shadow-2xs font-extrabold'
+                          : 'bg-white hover:bg-blue-50 text-ink-600 border border-ivory-200'
+                      }`}
+                    >
+                      ◐ Growing
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => updateSkillStatus(activeDomainTab, sIdx, 'Achieved')}
+                      className={`px-3 py-1.5 rounded-xl transition ${
+                        skill.status === 'Achieved'
+                          ? 'bg-emerald-600 text-white shadow-2xs font-extrabold'
+                          : 'bg-white hover:bg-emerald-50 text-ink-600 border border-ivory-200'
+                      }`}
+                    >
+                      ✓ Achieved
+                    </button>
                   </div>
                 </div>
               ))}
             </div>
+          </div>
 
-            <div className="flex justify-end pt-3 border-t border-ivory-200">
-              <button
-                type="button"
-                onClick={() => setShowGuideModal(false)}
-                className="px-4 py-2 rounded-xl bg-gradient-to-r from-[#20BDB2] to-[#38D3C7] text-white font-bold text-xs font-['Quicksand']"
-              >
-                Got It
-              </button>
+          {/* Teacher's Note for This Domain */}
+          <div className="space-y-2 pt-2 border-t border-ivory-200">
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-bold text-ink-800 font-['Quicksand']">
+                Teacher's Observation Note for {currentDomain.shortName}:
+              </label>
             </div>
+
+            {/* Quick Suggestions Tags */}
+            <div className="flex flex-wrap gap-1.5">
+              {DOMAIN_NOTE_SUGGESTIONS[currentDomain.area]?.map((suggestion, sIndex) => (
+                <button
+                  key={sIndex}
+                  type="button"
+                  onClick={() => appendDomainNote(activeDomainTab, suggestion)}
+                  className="text-[11px] px-2.5 py-1 rounded-xl bg-ivory-100 hover:bg-[#E0F7F4] text-ink-700 hover:text-[#0B4E49] border border-ivory-200 transition"
+                >
+                  + {suggestion}
+                </button>
+              ))}
+            </div>
+
+            <input
+              type="text"
+              value={currentDomain.note}
+              onChange={(e) => updateDomainNote(activeDomainTab, e.target.value)}
+              placeholder={`Write a brief note for ${currentDomain.shortName}...`}
+              className="w-full px-4 py-2.5 bg-ivory-50 border border-ivory-300 rounded-2xl text-xs text-ink-900 focus:outline-none focus:ring-2 focus:ring-[#21B8AF]"
+            />
+          </div>
+
+          {/* Section Navigation footer: Prev Section | Next Section */}
+          <div className="flex items-center justify-between pt-3 border-t border-ivory-200 text-xs font-['Quicksand'] font-bold">
+            <button
+              type="button"
+              disabled={activeDomainTab === 0}
+              onClick={() => setActiveDomainTab((prev) => Math.max(0, prev - 1))}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-ivory-100 hover:bg-ivory-200 disabled:opacity-30 text-ink-700 transition"
+            >
+              <ChevronLeft size={14} />
+              <span>Previous Section</span>
+            </button>
+            <span className="text-ink-400 font-normal">
+              Section {activeDomainTab + 1} of 6
+            </span>
+            <button
+              type="button"
+              disabled={activeDomainTab === 5}
+              onClick={() => setActiveDomainTab((prev) => Math.min(5, prev + 1))}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-[#20BDB2] to-[#38D3C7] text-white disabled:opacity-30 hover:from-[#1BA49A] hover:to-[#29BCB1] transition shadow-2xs"
+            >
+              <span>Next Section</span>
+              <ChevronRight size={14} />
+            </button>
           </div>
         </div>
       )}
 
-      {/* Report Card Modal Preview (1–2 Pages Printable) */}
+      {/* Two Clean Narrative Summary Cards */}
+      {activeReport && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 font-['Outfit']">
+          {/* Educator Overall Summary */}
+          <div className="bg-white p-5 rounded-3xl border border-ivory-300 shadow-xs space-y-2">
+            <h4 className="font-extrabold text-xs text-ink-900 font-['Quicksand'] flex items-center gap-1.5">
+              <span>📝</span>
+              <span>Lead Educator Monthly Narrative</span>
+            </h4>
+            <textarea
+              rows={3}
+              value={activeReport.teacherSummary}
+              onChange={(e) => updateTeacherSummary(e.target.value)}
+              placeholder="Overall positive summary of this month's growth..."
+              className="w-full p-3 bg-ivory-50 border border-ivory-300 rounded-2xl text-xs text-ink-900 focus:outline-none focus:ring-2 focus:ring-[#21B8AF] leading-relaxed"
+            />
+          </div>
+
+          {/* Classroom Joyful Moments */}
+          <div className="bg-white p-5 rounded-3xl border border-ivory-300 shadow-xs space-y-2">
+            <h4 className="font-extrabold text-xs text-[#0B4E49] font-['Quicksand'] flex items-center gap-1.5">
+              <span>🌟</span>
+              <span>Classroom Highlights &amp; Joyful Moments</span>
+            </h4>
+            <textarea
+              rows={3}
+              value={activeReport.highlights}
+              onChange={(e) => updateHighlights(e.target.value)}
+              placeholder="Favorite moments, shared giggles, creative discoveries..."
+              className="w-full p-3 bg-[#F0FBF9] border border-[#C3EFEB] rounded-2xl text-xs text-ink-900 focus:outline-none focus:ring-2 focus:ring-[#21B8AF] leading-relaxed"
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Printable Report Card Modal Preview */}
       {showPreviewModal && activeReport && (
         <div className="fixed inset-0 z-50 bg-ink-900/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto font-sans">
           <div className="w-full max-w-3xl bg-white rounded-3xl shadow-2xl border border-ivory-300 overflow-hidden my-8">
             {/* Modal Controls */}
             <div className="bg-ivory-100 px-6 py-3 border-b border-ivory-200 flex items-center justify-between font-['Quicksand']">
               <span className="text-xs font-bold text-ink-700">
-                Parent-Facing Monthly Report Card Preview
+                Parent Report Card Preview (1–2 Pages)
               </span>
               <div className="flex items-center gap-2">
                 <button
@@ -990,7 +804,7 @@ export const MonthlyProgressPage: React.FC<MonthlyProgressPageProps> = ({ onNavi
                   <p className="font-extrabold text-ink-900 text-sm mt-0.5 font-['Quicksand']">{activeReport.childName}</p>
                 </div>
                 <div>
-                  <span className="text-ink-500 font-medium">Classroom Section</span>
+                  <span className="text-ink-500 font-medium">Classroom</span>
                   <p className="font-bold text-ink-900 mt-0.5">{activeReport.classroom}</p>
                 </div>
                 <div>
@@ -1014,16 +828,20 @@ export const MonthlyProgressPage: React.FC<MonthlyProgressPageProps> = ({ onNavi
                   {activeReport.domains.map((dom) => (
                     <div
                       key={dom.area}
-                      className="p-3.5 rounded-xl border border-ivory-200 bg-ivory-50/40 space-y-2"
+                      className="p-3.5 rounded-2xl border border-ivory-200 bg-ivory-50/40 space-y-2"
                     >
                       <div className="flex items-center justify-between">
                         <span className="font-bold text-xs text-ink-900 font-['Quicksand'] flex items-center gap-1">
                           <span>{dom.icon}</span> {dom.area}
                         </span>
                         <span
-                          className={`text-[10px] font-bold px-2 py-0.5 rounded-md border ${getStatusBadge(
-                            dom.status
-                          )}`}
+                          className={`text-[10px] font-bold px-2 py-0.5 rounded-md border ${
+                            dom.status === 'Achieved'
+                              ? 'bg-emerald-100 text-emerald-800 border-emerald-300'
+                              : dom.status === 'Developing'
+                              ? 'bg-blue-100 text-blue-800 border-blue-300'
+                              : 'bg-amber-100 text-amber-800 border-amber-300'
+                          }`}
                         >
                           {dom.status}
                         </span>
@@ -1040,20 +858,20 @@ export const MonthlyProgressPage: React.FC<MonthlyProgressPageProps> = ({ onNavi
               <div className="space-y-3 pt-2 border-t border-ivory-200">
                 <div>
                   <h4 className="text-xs font-bold text-ink-900 mb-1 font-['Quicksand']">Teacher Summary</h4>
-                  <p className="text-xs text-ink-700 leading-relaxed bg-ivory-50 p-3 rounded-xl border border-ivory-200">
+                  <p className="text-xs text-ink-700 leading-relaxed bg-ivory-50 p-3 rounded-2xl border border-ivory-200">
                     {activeReport.teacherSummary}
                   </p>
                 </div>
 
                 <div>
                   <h4 className="text-xs font-bold text-ink-900 mb-1 font-['Quicksand']">Classroom Highlights &amp; Joyful Moments</h4>
-                  <p className="text-xs text-ink-700 leading-relaxed bg-[#F0FBF9] p-3 rounded-xl border border-[#C3EFEB]">
+                  <p className="text-xs text-ink-700 leading-relaxed bg-[#F0FBF9] p-3 rounded-2xl border border-[#C3EFEB]">
                     🌟 {activeReport.highlights}
                   </p>
                 </div>
               </div>
 
-              {/* Footer with Signatures */}
+              {/* Footer */}
               <div className="pt-4 border-t border-ivory-200 flex items-center justify-between text-xs text-ink-600">
                 <div>
                   <p className="font-bold text-ink-900">{activeReport.teacherName}</p>
